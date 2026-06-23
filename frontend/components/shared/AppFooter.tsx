@@ -1,7 +1,11 @@
 import Image from "next/image";
+import { Category } from "@/types/category";
+import { getCategoriesService } from "@/services/category";
 
-export const AppFooter = () =>
+export const AppFooter = async () =>
 	{
+		const categories: Category[] = await getCategoriesService();
+
 		return (
 				<footer className="footer_dark">
 					<div className="footer_top">
@@ -62,21 +66,11 @@ export const AppFooter = () =>
 									<div className="widget">
 										<h6 className="widget_title">Category</h6>
 										<ul className="widget_links">
-											<li>
-												<a href="#">Men</a>
-											</li>
-											<li>
-												<a href="#">Woman</a>
-											</li>
-											<li>
-												<a href="#">Kids</a>
-											</li>
-											<li>
-												<a href="#">Best Saller</a>
-											</li>
-											<li>
-												<a href="#">New Arrivals</a>
-											</li>
+											{categories.map((cat) => (
+													<li key={cat.id}>
+														<a href={`/category/${cat.slug}`}>{cat.name}</a>
+													</li>
+											))}
 										</ul>
 									</div>
 								</div>

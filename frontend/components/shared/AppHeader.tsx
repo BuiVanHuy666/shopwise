@@ -1,7 +1,11 @@
 import Image from "next/image";
+import { Category } from "@/types/category";
+import Link from "next/link";
+import { getCategoriesService } from "@/services/category";
 
-export const AppHeader = () =>
+export const AppHeader = async () =>
 	{
+		const categories: Category[] = await getCategoriesService();
 		return (
 				<header className="header_wrap fixed-top header_with_topbar">
 					<div className="top-header">
@@ -48,232 +52,95 @@ export const AppHeader = () =>
 							</div>
 						</div>
 					</div>
+
 					<div className="bottom_header dark_skin main_menu_uppercase">
 						<div className="container">
 							<nav className="navbar navbar-expand-lg">
-								<a className="navbar-brand" href="">
+								<Link className="navbar-brand" href="/">
 									<Image className="logo_dark" src="/assets/images/logo_dark.png" alt="logo" width={182} height={47}/>
 									<Image className="logo_light" src="/assets/images/logo_light.png" alt="logo" width={182} height={47}/>
-								</a>
+								</Link>
 								<button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-expanded="false">
 									<span className="ion-android-menu"></span>
 								</button>
 								<div className="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
 									<ul className="navbar-nav">
-										<li><a className="nav-link" href="#">About Us</a></li>
-										<li className="dropdown dropdown-mega-menu">
-											<a className="dropdown-toggle nav-link" href="#" data-bs-toggle="dropdown">Nam</a>
-											<div className="dropdown-menu">
-												<ul className="mega-menu d-lg-flex">
-													<li className="mega-menu-col col-lg-3">
-														<ul>
-															<li className="dropdown-header">{"Woman's"}</li>
-															<li>
-																<a className="dropdown-item nav-link nav_item" href="">Vestibulum sed</a>
-															</li>
-															<li>
-																<a className="dropdown-item nav-link nav_item" href="">Donec porttitor</a>
-															</li>
-															<li>
-																<a className="dropdown-item nav-link nav_item" href="">Donec vitae facilisis</a>
-															</li>
-															<li>
-																<a className="dropdown-item nav-link nav_item" href="">Curabitur tempus</a>
-															</li>
-															<li>
-																<a className="dropdown-item nav-link nav_item" href="">Vivamus in tortor</a>
-															</li>
-														</ul>
-													</li>
-													<li className="mega-menu-col col-lg-3">
-														<ul>
-															<li className="dropdown-header">{"Men's"}</li>
-															<li>
-																<a className="dropdown-item nav-link nav_item" href="">Donec vitae ante ante</a>
-															</li>
-															<li>
-																<a className="dropdown-item nav-link nav_item" href="">Etiam ac rutrum</a>
-															</li>
-															<li>
-																<a className="dropdown-item nav-link nav_item" href="">Quisque condimentum</a>
-															</li>
-															<li>
-																<a className="dropdown-item nav-link nav_item" href="">Curabitur laoreet</a>
-															</li>
-															<li>
-																<a className="dropdown-item nav-link nav_item" href="">Vivamus in tortor</a>
-															</li>
-														</ul>
-													</li>
-													<li className="mega-menu-col col-lg-3">
-														<ul>
-															<li className="dropdown-header">{"Kid's"}</li>
-															<li>
-																<a className="dropdown-item nav-link nav_item" href="">Donec vitae facilisis</a>
-															</li>
-															<li>
-																<a className="dropdown-item nav-link nav_item" href="">Quisque condimentum</a>
-															</li>
-															<li>
-																<a className="dropdown-item nav-link nav_item" href="">Etiam ac rutrum</a>
-															</li>
-															<li>
-																<a className="dropdown-item nav-link nav_item" href="">Donec vitae ante ante</a>
-															</li>
-															<li>
-																<a className="dropdown-item nav-link nav_item" href="">Donec porttitor</a>
-															</li>
-														</ul>
-													</li>
-													<li className="mega-menu-col col-lg-3">
-														<ul>
-															<li className="dropdown-header">Accessories</li>
-															<li>
-																<a className="dropdown-item nav-link nav_item" href="">Donec vitae facilisis</a>
-															</li>
-															<li>
-																<a className="dropdown-item nav-link nav_item" href="">Quisque condimentum</a>
-															</li>
-															<li>
-																<a className="dropdown-item nav-link nav_item" href="">Etiam ac rutrum</a>
-															</li>
-															<li>
-																<a className="dropdown-item nav-link nav_item" href="">Donec vitae ante ante</a>
-															</li>
-															<li>
-																<a className="dropdown-item nav-link nav_item" href="">Donec porttitor</a>
-															</li>
-														</ul>
-													</li>
-												</ul>
-												<div className="d-lg-flex menu_banners row g-3 px-3">
-													<div className="col-sm-4">
-														<div className="header-banner">
-															<Image src="/assets/images/menu_banner1.jpg" alt="menu_banner1" width={351} height={190}/>
-															<div className="banne_info">
-																<h6>10% Off</h6>
-																<h4>New Arrival</h4>
-																<a href="#">Shop now</a>
+										{categories.map((category) => (
+												<li key={category.id} className="dropdown dropdown-mega-menu">
+													<a
+															className={category.children && category.children.length > 0 ? 'dropdown-toggle nav-link' : 'nav-link'}
+															href="#"
+															data-bs-toggle="dropdown"
+													>
+														{category.name}
+													</a>
+
+													{category.children && category.children.length > 0 && (
+															<div className="dropdown-menu">
+																<ul className="mega-menu d-lg-flex flex-wrap">
+																	{category.children.map((child) =>
+																	{
+																		const childrenCount = category.children.length;
+																		const colSize = childrenCount >= 4 ? 3 : Math.floor(12 / childrenCount);
+
+																		return (
+																				<li key={child.id} className={`mega-menu-col col-lg-${colSize} mb-4`}>
+																					<ul>
+																						<li className="dropdown-header">{child.name}</li>
+																						{child.children && child.children.map((subChild) => (
+																								<li key={subChild.id}>
+																									<a className="dropdown-item nav-link nav_item" href="">
+																										{subChild.name}
+																									</a>
+																								</li>
+																						))}
+																					</ul>
+																				</li>
+																		);
+																	})}
+																</ul>
+
+																<div className="d-lg-flex menu_banners row g-3 px-3">
+																	<div className="col-sm-4">
+																		<div className="header-banner">
+																			<Image src="/assets/images/menu_banner1.jpg" alt="menu_banner1" width={351} height={190}/>
+																			<div className="banne_info">
+																				<h6>10% Off</h6>
+																				<h4>New Arrival</h4>
+																				<a href="#">Shop now</a>
+																			</div>
+																		</div>
+																	</div>
+																	<div className="col-sm-4">
+																		<div className="header-banner">
+																			<Image src="/assets/images/menu_banner2.jpg" alt="menu_banner2" width={351} height={190}/>
+																			<div className="banne_info">
+																				<h6>15% Off</h6>
+																				<h4>{"Men's Fashion"}</h4>
+																				<a href="#">Shop now</a>
+																			</div>
+																		</div>
+																	</div>
+																	<div className="col-sm-4">
+																		<div className="header-banner">
+																			<Image src="/assets/images/menu_banner3.jpg" alt="menu_banner3" width={351} height={190}/>
+																			<div className="banne_info">
+																				<h6>23% Off</h6>
+																				<h4>Kids Fashion</h4>
+																				<a href="#">Shop now</a>
+																			</div>
+																		</div>
+																	</div>
+																</div>
 															</div>
-														</div>
-													</div>
-													<div className="col-sm-4">
-														<div className="header-banner">
-															<Image src="/assets/images/menu_banner2.jpg" alt="menu_banner2" width={351} height={190}/>
-															<div className="banne_info">
-																<h6>15% Off</h6>
-																<h4>{"Men's Fashion"}</h4>
-																<a href="#">Shop now</a>
-															</div>
-														</div>
-													</div>
-													<div className="col-sm-4">
-														<div className="header-banner">
-															<Image src="/assets/images/menu_banner3.jpg" alt="menu_banner3" width={351} height={190}/>
-															<div className="banne_info">
-																<h6>23% Off</h6>
-																<h4>Kids Fashion</h4>
-																<a href="#">Shop now</a>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-										</li>
-										<li className="dropdown">
-											<a className="dropdown-toggle nav-link" href="#" data-bs-toggle="dropdown">Nữ</a>
-											<div className="dropdown-menu dropdown-reverse">
-												<ul>
-													<li>
-														<a className="dropdown-item menu-link dropdown-toggler" href="#">Grids</a>
-														<div className="dropdown-menu">
-															<ul>
-																<li>
-																	<a className="dropdown-item nav-link nav_item" href="">3 columns</a>
-																</li>
-																<li>
-																	<a className="dropdown-item nav-link nav_item" href="">4 columns</a>
-																</li>
-																<li>
-																	<a className="dropdown-item nav-link nav_item" href="">Left Sidebar</a>
-																</li>
-																<li>
-																	<a className="dropdown-item nav-link nav_item" href="">right Sidebar</a>
-																</li>
-																<li>
-																	<a className="dropdown-item nav-link nav_item" href="">Standard Left Sidebar</a>
-																</li>
-																<li>
-																	<a className="dropdown-item nav-link nav_item" href="">Standard right Sidebar</a>
-																</li>
-															</ul>
-														</div>
-													</li>
-													<li>
-														<a className="dropdown-item menu-link dropdown-toggler" href="#">Masonry</a>
-														<div className="dropdown-menu">
-															<ul>
-																<li>
-																	<a className="dropdown-item nav-link nav_item" href="">3 columns</a>
-																</li>
-																<li>
-																	<a className="dropdown-item nav-link nav_item" href="">4 columns</a>
-																</li>
-																<li>
-																	<a className="dropdown-item nav-link nav_item" href="">Left Sidebar</a>
-																</li>
-																<li>
-																	<a className="dropdown-item nav-link nav_item" href="">right Sidebar</a>
-																</li>
-															</ul>
-														</div>
-													</li>
-													<li>
-														<a className="dropdown-item menu-link dropdown-toggler" href="#">Single Post</a>
-														<div className="dropdown-menu">
-															<ul>
-																<li>
-																	<a className="dropdown-item nav-link nav_item" href="">Default</a>
-																</li>
-																<li>
-																	<a className="dropdown-item nav-link nav_item" href="">left sidebar</a>
-																</li>
-																<li>
-																	<a className="dropdown-item nav-link nav_item" href="">slider post</a>
-																</li>
-																<li>
-																	<a className="dropdown-item nav-link nav_item" href="">video post</a>
-																</li>
-																<li>
-																	<a className="dropdown-item nav-link nav_item" href="">audio post</a>
-																</li>
-															</ul>
-														</div>
-													</li>
-													<li>
-														<a className="dropdown-item menu-link dropdown-toggler" href="#">List</a>
-														<div className="dropdown-menu">
-															<ul>
-																<li>
-																	<a className="dropdown-item nav-link nav_item" href="">left sidebar</a>
-																</li>
-																<li>
-																	<a className="dropdown-item nav-link nav_item" href="">right sidebar</a>
-																</li>
-															</ul>
-														</div>
-													</li>
-												</ul>
-											</div>
-										</li>
-										<li>
-											<a className="nav-link nav_item" href="">Contact Us</a>
-										</li>
+													)}
+												</li>
+										))}
 									</ul>
 								</div>
 								<ul className="navbar-nav attr-nav align-items-center">
 									<li>
-										<a href="#" className="nav-link search_trigger"><i className="linearicons-magnifier"></i></a>
+										<a href="javascript:;" className="nav-link search_trigger"><i className="linearicons-magnifier"></i></a>
 										<div className="search_wrap">
 											<span className="close-search"><i className="ion-ios-close-empty"></i></span>
 											<form>

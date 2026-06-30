@@ -69,28 +69,22 @@ class CategorySeeder extends Seeder
 
     private function seedCategories(array $categories, ?int $parentId = null): void
     {
+        $sortOrder = 1;
+
         foreach ($categories as $key => $value) {
-            if (is_array($value)) {
-                $category = Category::create([
-                    'parent_id' => $parentId,
-                    'name' => $key,
-                    'slug' => Str::slug($key),
-                    'is_active' => true,
-                    'sort_order' => 0,
-                ]);
+            $name = is_array($value) ? $key : $value;
 
-                $this->seedCategories($value, $category->id);
-
-                continue;
-            }
-
-            Category::create([
+            $category = Category::create([
                 'parent_id' => $parentId,
-                'name' => $value,
-                'slug' => Str::slug($value),
+                'name' => $name,
+                'slug' => Str::slug($name),
                 'is_active' => true,
-                'sort_order' => 0,
+                'sort_order' => $sortOrder++,
             ]);
+
+            if (is_array($value)) {
+                $this->seedCategories($value, $category->id);
+            }
         }
     }
 }

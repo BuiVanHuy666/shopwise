@@ -57,7 +57,6 @@ export default async function RootLayout({children}: Readonly<{
 				<Script src="/assets/js/jquery-3.7.1.min.js" strategy="beforeInteractive"/>
 				<Script src="/assets/js/popper.min.js" strategy="lazyOnload"/>
 				<Script src="/assets/js/bootstrap.min.js" strategy="lazyOnload"/>
-				<Script src="/assets/owlcarousel/js/owl.carousel.min.js" strategy="lazyOnload"/>
 				<Script src="/assets/js/magnific-popup.min.js" strategy="lazyOnload"/>
 				<Script src="/assets/js/waypoints.min.js" strategy="lazyOnload"/>
 				<Script src="/assets/js/parallax.js" strategy="lazyOnload"/>

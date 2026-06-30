@@ -34,19 +34,19 @@ export const FeaturedProducts = () => {
 											<div className="product">
 												<div className="product_img">
 													<a href="">
-														<img src={`assets/images/product_img${i}.jpg`} alt={`product_img${i}`}/>
+														<img src={`/assets/images/product_img${i}.jpg`} alt={`product_img${i}`}/>
 													</a>
 													<div className="product_action_box">
 														<ul className="list_none pr_action_btn">
 															<li className="add-to-cart"><a href="#"><i className="icon-basket-loaded"></i> Add To Cart</a></li>
-															<li><a href="shop-compare.html" className="popup-ajax"><i className="icon-shuffle"></i></a></li>
-															<li><a href="shop-quick-view.html" className="popup-ajax"><i className="icon-magnifier-add"></i></a></li>
+															<li><a href="" className="popup-ajax"><i className="icon-shuffle"></i></a></li>
+															<li><a href="" className="popup-ajax"><i className="icon-magnifier-add"></i></a></li>
 															<li><a href="#"><i className="icon-heart"></i></a></li>
 														</ul>
 													</div>
 												</div>
 												<div className="product_info">
-													<h6 className="product_title"><a href="shop-product-detail.html">Product Name</a></h6>
+													<h6 className="product_title"><a href="">Product Name</a></h6>
 													<div className="product_price">
 														<span className="price">$45.00</span>
 														<del>$55.25</del>

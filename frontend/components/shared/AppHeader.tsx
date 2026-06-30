@@ -158,12 +158,12 @@ export const AppHeader = async () =>
 											<ul className="cart_list">
 												<li>
 													<a href="#" className="item_remove"><i className="ion-close"></i></a>
-													<a href="#"><img src="assets/images/cart_thamb1.jpg" alt="cart_thumb1"/>Variable product 001</a>
+													<a href="#"><img src="/assets/images/cart_thamb1.jpg" alt="cart_thumb1"/>Variable product 001</a>
 													<span className="cart_quantity"> 1 x <span className="cart_amount"> <span className="price_symbole">$</span></span>78.00</span>
 												</li>
 												<li>
 													<a href="#" className="item_remove"><i className="ion-close"></i></a>
-													<a href="#"><img src="assets/images/cart_thamb2.jpg" alt="cart_thumb2"/>Ornare sed consequat</a>
+													<a href="#"><img src="/assets/images/cart_thamb2.jpg" alt="cart_thumb2"/>Ornare sed consequat</a>
 													<span className="cart_quantity"> 1 x <span className="cart_amount"> <span className="price_symbole">$</span></span>81.00</span>
 												</li>
 											</ul>

@@ -1,3 +1,6 @@
+.pswp__img {
+	object-fit: contain !important;
+}
 /*@import "tailwindcss";*/
 
 /*:root {*/

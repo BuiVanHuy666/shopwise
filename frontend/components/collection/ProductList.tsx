@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ProductCard } from "@/components/shared/ProductCard";
 import { Product } from "@/types/product";
 import { loadMoreProductsAction } from "@/app/actions/product";
@@ -9,7 +9,8 @@ interface ProductListProps {
 	categorySlug: string;
 	initialCurrentPage: number;
 	lastPage: number;
-	totalProducts: number; // 1. Thêm prop này để nhận tổng số sản phẩm từ API
+	totalProducts: number;
+	currentSearchParams: { [key: string]: string | string[] | undefined };
 }
 
 export default function ProductList({
@@ -17,12 +18,18 @@ export default function ProductList({
 	categorySlug,
 	initialCurrentPage,
 	lastPage,
-	totalProducts // 2. Nhận prop
+	totalProducts,
+	currentSearchParams
 }: ProductListProps) {
 
 	const [products, setProducts] = useState<Product[]>(initialProducts);
 	const [currentPage, setCurrentPage] = useState<number>(initialCurrentPage);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
+
+	useEffect(() => {
+		setProducts(initialProducts);
+		setCurrentPage(initialCurrentPage);
+	}, [initialProducts, initialCurrentPage, totalProducts, categorySlug]);
 
 	const handleLoadMore = async () => {
 		if (isLoading || currentPage >= lastPage) return;
@@ -30,10 +37,16 @@ export default function ProductList({
 		setIsLoading(true);
 		try {
 			const nextPage = currentPage + 1;
-			const response = await loadMoreProductsAction(categorySlug, nextPage);
+			const response = await loadMoreProductsAction(categorySlug, nextPage, currentSearchParams);
 
 			if (response.data) {
-				setProducts(prev => [...prev, ...response.data]);
+				setProducts(prev => {
+					const newItems = response.data.filter(
+							(newItem: Product) => !prev.some((existingItem) => existingItem.id === newItem.id)
+					);
+
+					return [...prev, ...newItems];
+				});
 				setCurrentPage(nextPage);
 			} else {
 				console.warn(response.message);
@@ -70,11 +83,8 @@ export default function ProductList({
 					))}
 				</div>
 
-				{/* Khu vực phân trang */}
 				<div className="row mt-4 mb-3">
 					<div className="col-12 text-center">
-
-						{/* Nút Xem thêm */}
 						{currentPage < lastPage && (
 								<button
 										className="btn btn-fill-out"
@@ -82,20 +92,18 @@ export default function ProductList({
 										disabled={isLoading}
 										style={{
 											minWidth: '150px',
-											borderRadius: '30px', // Bo góc giống trong hình
-											backgroundColor: '#000', // Đổi màu đen
+											borderRadius: '30px',
+											backgroundColor: '#000',
 											color: '#fff'
 										}}
 								>
 									{isLoading ? (
 											<span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 									) : (
-											<>XEM THÊM &#8594;</> // Thêm mũi tên (→) giống hình
+											<>XEM THÊM &#8594;</>
 									)}
 								</button>
 						)}
-
-						{/* Dòng chữ hiển thị tiến độ */}
 						<div className="mt-3">
                        <span className="text-muted" style={{ fontSize: '16px' }}>
                            Hiển thị {products.length} trên tổng số {totalProducts} sản phẩm

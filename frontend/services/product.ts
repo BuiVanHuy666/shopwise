@@ -1,22 +1,20 @@
 import 'server-only';
 import { ProductDetail } from "@/types/product";
-import { CategoryWithProductResponse } from "@/types/category";
 
 const BACKEND_API_URL = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL;
 
-export async function getProductsByCategorySlugService(
-		categorySlug: string,
-		searchParams?: Record<string, string | number | undefined>
-): Promise<CategoryWithProductResponse> {
-	const query = searchParams
-			? '?' + new URLSearchParams(
-			Object.entries(searchParams)
-					.filter(([, value]) => value !== undefined)
-					.map(([key, value]) => [key, String(value)])
-	).toString()
-			: '';
+export const getProductsByCategorySlugService = async (slug: string, searchParams?: { [key: string]: string | string[] | undefined }) => {
+	const query = new URLSearchParams();
+	if (searchParams) {
+		Object.entries(searchParams).forEach(([key, value]) => {
+			if (value) query.append(key, String(value));
+		});
+	}
 
-	const res = await fetch(`${BACKEND_API_URL}/categories/${categorySlug}/products${query}`, {
+	const queryString = query.toString();
+	const apiUrl = `${process.env.BACKEND_API_URL}/categories/${slug}/products${queryString ? `?${queryString}` : ''}`;
+
+	const res = await fetch(apiUrl, {
 		next: { revalidate: 3600 }
 	});
 
@@ -41,13 +39,4 @@ export async function getProductDetailService(slug: string): Promise<ProductDeta
 
 	const result = await res.json();
 	return result.data;
-}
-
-export async function loadMoreProductsAction(categorySlug: string, page: number) {
-	try {
-		return await getProductsByCategorySlugService(categorySlug, {page});
-	} catch (error) {
-		console.error("Lỗi khi load thêm sản phẩm:", error);
-		return null;
-	}
 }

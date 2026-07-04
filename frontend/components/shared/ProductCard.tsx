@@ -3,7 +3,7 @@
 import { Product, ProductCardColor } from "@/types/product";
 import { formatCurrency, getHiddenImageUrl } from "@/utils/helper";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface ProductCardProps {
 	product: Product;
@@ -11,11 +11,17 @@ interface ProductCardProps {
 
 export const ProductCard = ({ product }: ProductCardProps) => {
 	const defaultImage = product.thumbnail ?? product.colors?.[0]?.image_url ?? null;
+	const defaultColor = product.colors?.[0]?.color_group ?? null;
 
 	const [activeImage, setActiveImage] = useState<string | null>(defaultImage);
 	const [activeColor, setActiveColor] = useState<string | null>(
 		product.colors?.[0]?.color_group ?? null
 	);
+
+	useEffect(() => {
+		setActiveImage(defaultImage);
+		setActiveColor(defaultColor);
+	}, [defaultImage, defaultColor]);
 
 	const handleColorSelect = (colorGroup: string, imageUrl: string) => {
 		setActiveColor(colorGroup);
@@ -83,13 +89,12 @@ export const ProductCard = ({ product }: ProductCardProps) => {
 					)}
 				</div>
 
-				{/* FIX: Bọc các thẻ <li> vào <ul> và thêm Flexbox để hiển thị ngang */}
 				<ul
 					className="list_none d-flex align-items-center"
 					style={{ gap: "8px", padding: 0, margin: "10px 0" }}
 				>
-					{product.colors?.map((color: ProductCardColor) => (
-						<li key={color.color_group} style={{ display: "inline-block" }}>
+					{product.colors?.map((color: ProductCardColor, index: number) => (
+						<li key={`${color.color_group}-${index}`} style={{ display: "inline-block" }}>
 							<button
 								type="button"
 								aria-label={color.color_group}

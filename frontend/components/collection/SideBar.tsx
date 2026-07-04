@@ -5,22 +5,55 @@ import Slider from "rc-slider";
 import 'rc-slider/assets/index.css';
 import { formatCurrency } from "@/utils/helper";
 import { Constants } from "@/types/constant";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 
 export default function Sidebar({ category, constants }: {
 	category: Category,
 	constants: Constants
 }) {
+	const router = useRouter();
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
+
 	const availableSizes = constants?.sizes || [];
 	const availableColors = constants?.colors || [];
 
-	const [activeColor, setActiveColor] = useState<string | null>(availableColors[0]?.value || null);
-	const [activeSize, setActiveSize] = useState<string | null>(availableSizes[0] || null);
-	const [priceRange, setPriceRange] = useState<number[]>([50000, 200000]);
+	const activeColor = searchParams.get('color');
+	const activeSize = searchParams.get('size');
+
+	const initialMinPrice = Number(searchParams.get('min_price')) || 50000;
+	const initialMaxPrice = Number(searchParams.get('max_price')) || 200000;
+	const [priceRange, setPriceRange] = useState<number[]>([initialMinPrice, initialMaxPrice]);
+
+	const handleFilterChange = (key: string, value: string) => {
+		const params = new URLSearchParams(searchParams.toString());
+
+		if (params.get(key) === value) {
+			params.delete(key);
+		} else {
+			params.set(key, value);
+		}
+
+		params.delete('page');
+		router.push(`${pathname}?${params.toString()}`, { scroll: false });
+	};
+
+	const handlePriceChangeComplete = (value: number | number[]) => {
+		if (Array.isArray(value)) {
+			const params = new URLSearchParams(searchParams.toString());
+			params.set('min_price', value[0].toString());
+			params.set('max_price', value[1].toString());
+			params.delete('page');
+
+			router.push(`${pathname}?${params.toString()}`, { scroll: false });
+		}
+	};
 
 	return (
 			<div className="sidebar">
-					{
-						category?.children?.length ? (
+				{
+					category?.children?.length ? (
 							<div className="widget">
 								<h5 className="widget_title">Danh mục</h5>
 								<ul className="widget_categories">
@@ -34,8 +67,8 @@ export default function Sidebar({ category, constants }: {
 									))}
 								</ul>
 							</div>
-						) : null
-					}
+					) : null
+				}
 
 				<div className="widget">
 					<h5 className="widget_title">Khoảng giá</h5>
@@ -48,6 +81,7 @@ export default function Sidebar({ category, constants }: {
 									step={50000}
 									value={priceRange}
 									onChange={(value) => setPriceRange(value as number[])}
+									onChangeComplete={handlePriceChangeComplete}
 									trackStyle={[{ backgroundColor: '#FF324D' }]}
 									handleStyle={[
 										{ borderColor: '#FF324D', backgroundColor: '#fff', opacity: 1 },
@@ -83,8 +117,9 @@ export default function Sidebar({ category, constants }: {
 											textAlign: 'center',
 											fontSize: '14px',
 											padding: '0 10px',
+											border: activeSize === size ? '2px solid #FF324D' : '1px solid #ddd',
 										}}
-										onClick={() => setActiveSize(size)}
+										onClick={() => handleFilterChange('size', size)}
 								>
                             {size}
                         </span>
@@ -108,7 +143,7 @@ export default function Sidebar({ category, constants }: {
 										key={index}
 										className="d-flex flex-column align-items-center"
 										style={{ cursor: 'pointer' }}
-										onClick={() => setActiveColor(color.value)}
+										onClick={() => handleFilterChange('color', color.value)}
 								>
                             <span
 		                            className={activeColor === color.value ? 'active' : ''}
@@ -118,9 +153,7 @@ export default function Sidebar({ category, constants }: {
 			                            height: '32px',
 			                            display: 'inline-block',
 			                            borderRadius: '100%',
-			                            border: color.value.toLowerCase() === '#ffffff' || color.value.toLowerCase() === 'white'
-					                            ? '1px solid #ccc'
-					                            : 'none',
+			                            border: '2px solid #ccc',
 			                            marginBottom: '6px'
 		                            }}
                             ></span>
@@ -142,7 +175,7 @@ export default function Sidebar({ category, constants }: {
 				<div className="widget">
 					<div className="shop_banner">
 						<div className="banner_img overlay_bg_20">
-							<img src="/assets/images/sidebar_banner_img.jpg" alt="Banner quảng cáo" />
+							<Image src="/assets/images/sidebar_banner_img.jpg" alt="Banner quảng cáo" width={255} height={350} />
 						</div>
 						<div className="shop_bn_content2 text_white">
 							<h5 className="text-uppercase shop_subtitle">Bộ sưu tập mới</h5>

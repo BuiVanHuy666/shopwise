@@ -10,11 +10,11 @@ class ProductCardResource extends JsonResource
 {
     public function toArray($request): array
     {
-        $activeColors = $request->input('colors', []);
+        $activeColors = $request->input('color') ? (array) $request->input('color') : [];
 
         $thumbnailColor = !empty($activeColors)
-            ? $this->colors->firstWhere('color_group', $activeColors[0]) ?? $this->colors->first()
-            : $this->colors->first();
+                    ? $this->colors->firstWhere('color_group', $activeColors[0]) ?? $this->colors->first()
+                    : $this->colors->first();
 
         return [
             'id'        => $this->id,

@@ -5,16 +5,17 @@ import { getConstantsService } from "@/services/constant";
 import Sidebar from "@/components/collection/SideBar";
 import { Newsletter } from "@/components/shared/Newsletter";
 
-export default async function CollectionPage({params}: {params: Promise<{slug: string}>}) {
+export default async function CollectionPage({params, searchParams}: {params: Promise<{slug: string}>, searchParams: Promise<{ [key: string]: string | string[] | undefined }>}) {
 	const {slug} = await params;
+	const currentSearchParams = await searchParams;
 
 	let productsResponse;
 	let constantsData;
 
 	try {
 		[productsResponse, constantsData] = await Promise.all([
-			getProductsByCategorySlugService(slug),
-			getConstantsService(['colors', 'sizes'])
+			getProductsByCategorySlugService(slug, currentSearchParams),
+			getConstantsService()
 		]);
 	} catch (error) {
 		console.error("Lỗi khi tải dữ liệu trang danh mục:", error);
@@ -62,6 +63,7 @@ export default async function CollectionPage({params}: {params: Promise<{slug: s
 											initialCurrentPage={currentPage}
 											lastPage={lastPage}
 											totalProducts={totalProducts}
+											currentSearchParams={currentSearchParams}
 									/>
 
 								</div>

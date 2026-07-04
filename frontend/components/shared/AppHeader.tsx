@@ -80,13 +80,13 @@ export const AppHeader = async () =>
 																<ul className="mega-menu d-lg-flex flex-wrap">
 																	{category.children.map((child) =>
 																	{
-																		const childrenCount = category.children.length;
+																		const childrenCount = category.children!.length;
 																		const colSize = childrenCount >= 4 ? 3 : Math.floor(12 / childrenCount);
 
 																		return (
 																				<li key={child.id} className={`mega-menu-col col-lg-${colSize} mb-4`}>
 																					<ul>
-																						<li className="dropdown-header">{child.name}</li>
+																						<li className="dropdown-header"><Link href={`/collection/${child.slug}`}>{child.name}</Link></li>
 																						{child.children && child.children.map((subChild) => (
 																								<li key={subChild.id}>
 																									<Link className="dropdown-item nav-link nav_item" href={`/collection/${subChild.slug}`}>

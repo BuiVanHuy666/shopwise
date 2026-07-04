@@ -2,9 +2,18 @@
 
 import { getProductsByCategorySlugService } from "@/services/product";
 
-export async function loadMoreProductsAction(categorySlug: string, page: number) {
+export async function loadMoreProductsAction(
+		categorySlug: string,
+		page: number,
+		currentSearchParams: { [key: string]: string | string[] | undefined }
+) {
 	try {
-		const response = await getProductsByCategorySlugService(categorySlug, {page: page});
+		const paramsToPass = {
+			...currentSearchParams,
+			page: page.toString()
+		};
+
+		const response = await getProductsByCategorySlugService(categorySlug, paramsToPass)
 
 		return {
 			data: response.data || [],

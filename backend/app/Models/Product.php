@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 
 #[Fillable([
     'category_id',
@@ -25,8 +27,8 @@ class Product extends Model
 {
     use SoftDeletes;
 
-    const THUMBNAIL_DIR = 'products/thumbnails';
-    const COLOR_IMAGE_DIR = 'products/colors';
+    const string THUMBNAIL_DIR = 'products/thumbnails';
+    const string COLOR_IMAGE_DIR = 'products/colors';
 
     protected $casts = [
         'additional_info' => 'array',
@@ -36,16 +38,6 @@ class Product extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
-    }
-
-    // ══════════════════════════════════════════════════════════
-    // URL helpers
-    // ══════════════════════════════════════════════════════════
-    public function getThumbnailUrl(): ?string
-    {
-        if (!$this->thumbnail) return null;
-
-        return Storage::url(self::THUMBNAIL_DIR . '/' . $this->thumbnail);
     }
 
     // ══════════════════════════════════════════════════════════
@@ -66,8 +58,39 @@ class Product extends Model
         return $this->hasMany(ProductColor::class);
     }
 
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder|QueryBuilder
     {
         return $query->where('is_active', 1);
+    }
+
+    public function scopeName(Builder $query, string $name): Builder|QueryBuilder
+    {
+        return $query->where('name', 'LIKE', '%' . $name . '%');
+    }
+
+    public function scopePriceRange(Builder $query, ?float $from = null, ?float $to = null): Builder|QueryBuilder
+    {
+        if ($from && !$to) {
+            return $query->where('price', '>=', $from);
+        }
+        if (!$from && $to) {
+            return $query->where('price', '<=', $to);
+        }
+
+        return $query->whereBetween('price', [$from, $to]);
+    }
+
+    public function scopeColors(Builder $query, array $colors): Builder|QueryBuilder
+    {
+        return $query->whereHas('colors', function (Builder $query) use ($colors) {
+            $query->whereIn('color_group', $colors);
+        });
+    }
+
+    public function scopeSizes(Builder $query, array $sizes): Builder|QueryBuilder
+    {
+        return $query->whereHas('variants.attributeValues', function (Builder $query) use ($sizes) {
+            $query->whereIn('value', $sizes);
+        });
     }
 }

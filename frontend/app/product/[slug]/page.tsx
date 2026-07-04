@@ -15,6 +15,8 @@ export default async function ProductDetailPage({params}: {
 
 		const product = await getProductDetailService(slug);
 
+		console.log(">>> checking product: ", product, " >>>")
+
 		if (!product) {
 			notFound();
 		}
@@ -26,7 +28,7 @@ export default async function ProductDetailPage({params}: {
 							<ProductInteractive product={product}/>
 							<div className="row">
 								<div className="col-12">
-									<div className="large_divider clearfix" />
+									<div className="large_divider clearfix"/>
 								</div>
 							</div>
 							<div className="row">
@@ -39,9 +41,9 @@ export default async function ProductDetailPage({params}: {
 							</div>
 							<div className="row">
 								<div className="col-12">
-									<div className="small_divider" />
-									<div className="divider" />
-									<div className="medium_divider" />
+									<div className="small_divider"/>
+									<div className="divider"/>
+									<div className="medium_divider"/>
 								</div>
 							</div>
 							<div className="row">

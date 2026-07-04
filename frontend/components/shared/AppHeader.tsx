@@ -67,13 +67,13 @@ export const AppHeader = async () =>
 									<ul className="navbar-nav">
 										{categories.map((category) => (
 												<li key={category.id} className="dropdown dropdown-mega-menu">
-													<a
+													<Link
 															className={category.children && category.children.length > 0 ? 'dropdown-toggle nav-link' : 'nav-link'}
-															href="#"
+															href={`/collection/${category.slug}`}
 															data-bs-toggle="dropdown"
 													>
 														{category.name}
-													</a>
+													</Link>
 
 													{category.children && category.children.length > 0 && (
 															<div className="dropdown-menu">
@@ -89,9 +89,9 @@ export const AppHeader = async () =>
 																						<li className="dropdown-header">{child.name}</li>
 																						{child.children && child.children.map((subChild) => (
 																								<li key={subChild.id}>
-																									<a className="dropdown-item nav-link nav_item" href="">
+																									<Link className="dropdown-item nav-link nav_item" href={`/collection/${subChild.slug}`}>
 																										{subChild.name}
-																									</a>
+																									</Link>
 																								</li>
 																						))}
 																					</ul>

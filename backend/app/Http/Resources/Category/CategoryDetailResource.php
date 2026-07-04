@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Category;
 
-use App\Http\Resources\Product\ProductListResource;
+use App\Http\Resources\Product\ProductCardResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CategoryResource extends JsonResource
+class CategoryDetailResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
@@ -16,10 +16,10 @@ class CategoryResource extends JsonResource
             'slug' => $this->slug,
             'description' => $this->description,
             'sort_order' => $this->sort_order,
-            'children' => CategoryResource::collection(
+            'children' => CategoryDetailResource::collection(
                 $this->whenLoaded('children')
             ),
-            'products' => ProductListResource::collection($this->whenLoaded('products')),
+            'products' => ProductCardResource::collection($this->whenLoaded('products')),
         ];
     }
 }

@@ -1,89 +1,89 @@
 "use client"
 import { useState } from "react";
+import { Category } from "@/types/category";
+import Slider from "rc-slider";
+import 'rc-slider/assets/index.css';
+import { formatCurrency } from "@/utils/helper";
+import { Constants } from "@/types/constant";
 
-const colors = ['#87554B', '#333333', '#DA323F', '#2F366C', '#B5B6BB'];
-const sizes = ['xs', 's', 'm', 'l', 'xl'];
+export default function Sidebar({ category, constants }: {
+	category: Category,
+	constants: Constants
+}) {
+	const availableSizes = constants?.sizes || [];
+	const availableColors = constants?.colors || [];
 
-export default function Sidebar() {
-	const [activeColor, setActiveColor] = useState(colors[0]);
-	const [activeSize, setActiveSize] = useState(sizes[0]);
+	const [activeColor, setActiveColor] = useState<string | null>(availableColors[0]?.value || null);
+	const [activeSize, setActiveSize] = useState<string | null>(availableSizes[0] || null);
+	const [priceRange, setPriceRange] = useState<number[]>([50000, 200000]);
+
 	return (
 			<div className="sidebar">
+					{
+						category?.children?.length ? (
+							<div className="widget">
+								<h5 className="widget_title">Danh mục</h5>
+								<ul className="widget_categories">
+									{category.children.map((child) => (
+											<li key={child.id}>
+												<a href={child.slug}>
+													<span className="categories_name">{child.name}</span>
+													<span className="categories_num">(9)</span>
+												</a>
+											</li>
+									))}
+								</ul>
+							</div>
+						) : null
+					}
+
 				<div className="widget">
-					<h5 className="widget_title">Categories</h5>
-					<ul className="widget_categories">
-						<li>
-							<a href="#"><span className="categories_name">Women</span><span className="categories_num">(9)</span></a>
-						</li>
-						<li>
-							<a href="#"><span className="categories_name">Top</span><span className="categories_num">(6)</span></a>
-						</li>
-						<li>
-							<a href="#"><span className="categories_name">T-Shirts</span><span className="categories_num">(4)</span></a>
-						</li>
-						<li>
-							<a href="#"><span className="categories_name">Men</span><span className="categories_num">(7)</span></a>
-						</li>
-						<li>
-							<a href="#"><span className="categories_name">Shoes</span><span className="categories_num">(12)</span></a>
-						</li>
-					</ul>
-				</div>
-				<div className="widget">
-					<h5 className="widget_title">Filter</h5>
+					<h5 className="widget_title">Khoảng giá</h5>
 					<div className="filter_price">
-						<div id="price_filter" data-min="0" data-max="500" data-min-value="50" data-max-value="300" data-price-sign="$"></div>
-						<div className="price_range">
-							<span>Price: <span id="flt_price"></span></span>
-							<input type="hidden" id="price_first"/>
-							<input type="hidden" id="price_second"/>
+						<div className="mt-3 mb-4 px-2">
+							<Slider
+									range
+									min={0}
+									max={1000000}
+									step={50000}
+									value={priceRange}
+									onChange={(value) => setPriceRange(value as number[])}
+									trackStyle={[{ backgroundColor: '#FF324D' }]}
+									handleStyle={[
+										{ borderColor: '#FF324D', backgroundColor: '#fff', opacity: 1 },
+										{ borderColor: '#FF324D', backgroundColor: '#fff', opacity: 1 }
+									]}
+							/>
+						</div>
+
+						<div className="price_range d-flex align-items-center">
+                        <span>
+                            Giá: <span className="font-weight-bold ml-1" style={{ color: '#FF324D' }}>
+                                {formatCurrency(priceRange[0])} - {formatCurrency(priceRange[1])}
+                            </span>
+                        </span>
 						</div>
 					</div>
 				</div>
+
 				<div className="widget">
-					<h5 className="widget_title">Brand</h5>
-					<ul className="list_brand">
-						<li>
-							<div className="custome-checkbox">
-								<input className="form-check-input" type="checkbox" name="checkbox" id="Arrivals" value=""/>
-								<label className="form-check-label" htmlFor="Arrivals"><span>New Arrivals</span></label>
-							</div>
-						</li>
-						<li>
-							<div className="custome-checkbox">
-								<input className="form-check-input" type="checkbox" name="checkbox" id="Lighting" value=""/>
-								<label className="form-check-label" htmlFor="Lighting"><span>Lighting</span></label>
-							</div>
-						</li>
-						<li>
-							<div className="custome-checkbox">
-								<input className="form-check-input" type="checkbox" name="checkbox" id="Tables" value=""/>
-								<label className="form-check-label" htmlFor="Tables"><span>Tables</span></label>
-							</div>
-						</li>
-						<li>
-							<div className="custome-checkbox">
-								<input className="form-check-input" type="checkbox" name="checkbox" id="Chairs" value=""/>
-								<label className="form-check-label" htmlFor="Chairs"><span>Chairs</span></label>
-							</div>
-						</li>
-						<li>
-							<div className="custome-checkbox">
-								<input className="form-check-input" type="checkbox" name="checkbox" id="Accessories" value=""/>
-								<label className="form-check-label" htmlFor="Accessories"><span>Accessories</span></label>
-							</div>
-						</li>
-					</ul>
-				</div>
-				<div className="widget">
-					<h5 className="widget_title">Size</h5>
-					{/* Thêm d-flex flex-wrap gap-2 để tạo khoảng cách giữa các size */}
+					<h5 className="widget_title">Kích thước</h5>
 					<div className="product_size_switch d-flex flex-wrap gap-2">
-						{sizes.map((size, index) => (
+						{availableSizes?.map((size: string, index: number) => (
 								<span
 										key={index}
 										className={activeSize === size ? 'active' : ''}
-										style={{ cursor: 'pointer', textTransform: 'uppercase' }}
+										style={{
+											cursor: 'pointer',
+											textTransform: 'uppercase',
+											borderRadius: '10px',
+											minWidth: '40px',
+											height: '40px',
+											lineHeight: '40px',
+											textAlign: 'center',
+											fontSize: '14px',
+											padding: '0 10px',
+										}}
 										onClick={() => setActiveSize(size)}
 								>
                             {size}
@@ -91,35 +91,63 @@ export default function Sidebar() {
 						))}
 					</div>
 				</div>
+
 				<div className="widget">
-					<h5 className="widget_title">Color</h5>
-					<div className="product_color_switch d-flex gap-2">
-						{colors.map((color, index) => (
-								<span
+					<h5 className="widget_title">Màu sắc</h5>
+					<div
+							className="product_color_switch"
+							style={{
+								display: 'grid',
+								gridTemplateColumns: 'repeat(4, 1fr)',
+								rowGap: '15px',
+								columnGap: '10px'
+							}}
+					>
+						{availableColors?.map((color, index) => (
+								<div
 										key={index}
-										className={activeColor === color ? 'active' : ''}
-										style={{
-											backgroundColor: color,
-											cursor: 'pointer',
-											width: '20px',
-											height: '20px',
-											display: 'inline-block',
-											borderRadius: '100%' // Bo tròn nếu template yêu cầu
-										}}
-										onClick={() => setActiveColor(color)}
-								></span>
+										className="d-flex flex-column align-items-center"
+										style={{ cursor: 'pointer' }}
+										onClick={() => setActiveColor(color.value)}
+								>
+                            <span
+		                            className={activeColor === color.value ? 'active' : ''}
+		                            style={{
+			                            backgroundColor: color.value,
+			                            width: '32px',
+			                            height: '32px',
+			                            display: 'inline-block',
+			                            borderRadius: '100%',
+			                            border: color.value.toLowerCase() === '#ffffff' || color.value.toLowerCase() === 'white'
+					                            ? '1px solid #ccc'
+					                            : 'none',
+			                            marginBottom: '6px'
+		                            }}
+                            ></span>
+									<div style={{
+										fontSize: '12px',
+										color: activeColor === color.value ? '#FF324D' : '#687188',
+										fontWeight: activeColor === color.value ? '600' : '400',
+										textAlign: 'center',
+										lineHeight: '1.2',
+										wordBreak: 'break-word'
+									}}>
+										{color.label}
+									</div>
+								</div>
 						))}
 					</div>
 				</div>
+
 				<div className="widget">
 					<div className="shop_banner">
 						<div className="banner_img overlay_bg_20">
-							<img src="/assets/images/sidebar_banner_img.jpg" alt="sidebar_banner_img"/>
+							<img src="/assets/images/sidebar_banner_img.jpg" alt="Banner quảng cáo" />
 						</div>
 						<div className="shop_bn_content2 text_white">
-							<h5 className="text-uppercase shop_subtitle">New Collection</h5>
-							<h3 className="text-uppercase shop_title">Sale 30% Off</h3>
-							<a href="#" className="btn btn-white rounded-0 btn-sm text-uppercase">Shop Now</a>
+							<h5 className="text-uppercase shop_subtitle">Bộ sưu tập mới</h5>
+							<h3 className="text-uppercase shop_title">Giảm giá 30%</h3>
+							<a href="#" className="btn btn-white rounded-0 btn-sm text-uppercase">Mua ngay</a>
 						</div>
 					</div>
 				</div>

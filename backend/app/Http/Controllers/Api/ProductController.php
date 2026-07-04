@@ -1,22 +1,26 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
-use App\Models\Product;
-use App\Http\Resources\Product\ProductListResource;
+use App\Http\Controllers\Controller;
 use App\Http\Resources\Product\ProductDetailResource;
+use App\Models\Product;
+use App\Services\ProductService;
+use App\Models\Category;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index()
-    {
-        $products = Product::query()
-                           ->with(['colors'])
-                           ->where('is_active', true)
-                           ->latest()
-                           ->paginate(12);
+    public function __construct(
+        private readonly ProductService $productService,
+    ) {}
 
-        return ProductListResource::collection($products);
+    public function index(Category $category, Request $request): JsonResponse
+    {
+        $payload = $this->productService->getProducts($category, $request);
+
+        return response()->json($payload);
     }
 
     public function show($slug)

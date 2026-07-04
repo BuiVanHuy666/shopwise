@@ -1,6 +1,5 @@
 import { Category } from "@/types/category";
 
-// 1. Interface cho trang danh sách (Product List)
 export interface Product {
 	id: number;
 	name: string;
@@ -33,7 +32,7 @@ export interface ProductVariant {
 	sku: string;
 	price: number;
 	sale_price: number | null;
-	discount_percent: number; // Tính toán cho từng biến thể
+	discount_percent: number;
 	stock: number;
 	attribute_value_ids: number[];
 }
@@ -43,7 +42,6 @@ export interface ProductAttribute {
 	values: { id: number; value: string }[];
 }
 
-// 3. Interface chính cho trang Chi tiết
 export interface ProductDetail {
 	id: number;
 	name: string;
@@ -55,14 +53,13 @@ export interface ProductDetail {
 	additional_info: Record<string, string> | null;
 	price: number;
 	sale_price: number | null;
-	discount_percent: number; // Tính toán cho sản phẩm chính
+	discount_percent: number;
 	color_options: ProductColorOption[];
-	size_options: SizeOption[]; // Thêm mảng size đã gom nhóm
-	attributes: ProductAttribute[]; // Các thuộc tính khác nếu có
+	size_options: SizeOption[];
+	attributes: ProductAttribute[];
 	variants: ProductVariant[];
 }
 
-// 4. Interface cho API Response
 export interface ProductListResponse {
 	data: Product[];
 }
@@ -70,3 +67,5 @@ export interface ProductListResponse {
 export interface ProductDetailResponse {
 	data: ProductDetail;
 }
+
+export type UploadType = 'thumbnails' | 'colors';

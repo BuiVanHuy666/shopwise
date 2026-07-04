@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -33,6 +34,17 @@ class Category extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    public function resolveRouteBinding($value, $field = null): ?Model
+    {
+        $category = parent::resolveRouteBinding($value, $field);
+
+        if ($category && !$category->is_active) {
+            throw new ModelNotFoundException();
+        }
+
+        return $category;
     }
 
     private static function clearCategoryCache(): void
@@ -67,7 +79,7 @@ class Category extends Model
     {
         $ids = [];
 
-        foreach ($this->children as $child) {
+        foreach ($this->load('children')->children as $child) {
             $ids[] = $child->id;
             $ids = array_merge($ids, $child->getAllChildIds());
         }

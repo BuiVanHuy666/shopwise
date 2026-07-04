@@ -15,7 +15,7 @@ class Variant extends Model
 
     public function product(): BelongsTo
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Product::class);
     }
 
     public function attributeValues(): BelongsToMany

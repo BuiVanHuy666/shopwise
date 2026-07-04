@@ -2,7 +2,8 @@
 
 namespace App\Services;
 
-use App\Http\Resources\CategoryResource;
+use App\Http\Resources\Category\CategoryDetailResource;
+use App\Http\Resources\Category\CategoryResource;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Support\Facades\Cache;
@@ -23,7 +24,7 @@ class CategoryService {
 
             $data = $query->get();
 
-            $resourceArray = json_decode(CategoryResource::collection($data)->toJson(), true);
+            $resourceArray = json_decode(CategoryDetailResource::collection($data)->toJson(), true);
             return $resourceArray ?? [];
         });
     }

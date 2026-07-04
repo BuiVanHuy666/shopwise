@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Products\Schemas;
 use App\Models\Attribute;
 use App\Models\AttributeValue;
 use App\Models\Product;
+use App\Models\ProductColor;
 use Filament\Actions\Action;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
@@ -128,12 +129,17 @@ class ProductForm
                                              ->default(fn() => (string)Str::uuid()),
 
                                        TextInput::make('color_name')
-                                                ->label('Tên màu')
-                                                ->placeholder('VD: Đỏ mận, Trắng sữa...')
+                                                ->label('Tên màu (Hiển thị cho khách)')
+                                                ->placeholder('VD: Xanh rêu, Trắng sữa...')
                                                 ->required(),
+                                       Select::make('color_group')
+                                             ->label('Nhóm màu (Dùng để lọc)')
+                                             ->options(ProductColor::COLOR_GROUPS)
+                                             ->searchable()
+                                             ->required(),
 
                                        ColorPicker::make('color_hex')
-                                                  ->label('Mã màu')
+                                                  ->label('Mã màu (Mã HEX)')
                                                   ->required(),
 
                                        FileUpload::make('images')
@@ -149,7 +155,7 @@ class ProductForm
                                                  ->columnSpanFull()
                                                  ->required(),
                                    ])
-                                   ->columns(2)
+                                   ->columns(3)
                                    ->addActionLabel('Thêm màu sắc')
                                    ->defaultItems(0)
                                    ->collapsible()

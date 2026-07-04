@@ -6,9 +6,9 @@ import { FreeMode, Navigation, Thumbs } from "swiper/modules";
 import { Gallery as PhotoSwipeGallery, Item } from 'react-photoswipe-gallery';
 import type { Swiper as SwiperType } from 'swiper';
 import 'photoswipe/dist/photoswipe.css';
-
 import { ProductColorOption } from "@/types/product";
 import Image from "next/image";
+import { getHiddenImageUrl } from "@/utils/helper";
 
 type Props = {
 	colorOptions: ProductColorOption[];
@@ -33,8 +33,6 @@ export default function Gallery({ colorOptions, selectedColorId, activeImageInde
 		}
 	}, [selectedColorId, safeIndex, mainSwiper]);
 
-	const getHiddenImageUrl = (filename: string) => `/uploads/${filename}`;
-
 	return (
 			<div className="product-image">
 				<PhotoSwipeGallery>
@@ -52,8 +50,8 @@ export default function Gallery({ colorOptions, selectedColorId, activeImageInde
 							{displayImages.map((src, index) => (
 									<SwiperSlide key={`${selectedColorId}-main-${index}`}>
 										<Item
-												original={getHiddenImageUrl(src)}
-												thumbnail={getHiddenImageUrl(src)}
+												original={getHiddenImageUrl(src, 'colors')}
+												thumbnail={getHiddenImageUrl(src, 'colors')}
 												width="1200"
 												height="1600"
 										>
@@ -65,7 +63,7 @@ export default function Gallery({ colorOptions, selectedColorId, activeImageInde
 													>
 														<Image
 																ref={ref as any}
-																src={getHiddenImageUrl(src)}
+																src={getHiddenImageUrl(src, 'colors')}
 																alt={`product-main-${index}`}
 																fill
 																className="object-cover"
@@ -103,7 +101,7 @@ export default function Gallery({ colorOptions, selectedColorId, activeImageInde
 										className="relative w-full border rounded overflow-hidden cursor-pointer hover:border-red-500 transition-colors bg-gray-50"
 								>
 									<Image
-											src={getHiddenImageUrl(src)}
+											src={getHiddenImageUrl(src, 'colors')}
 											alt={`product-thumb-${index}`}
 											fill
 											className="object-cover"

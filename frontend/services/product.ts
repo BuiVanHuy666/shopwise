@@ -1,19 +1,33 @@
 import 'server-only';
-import { Product, ProductDetail, ProductListResponse } from "@/types/product";
+import { ProductDetail } from "@/types/product";
+import { CategoryWithProductResponse } from "@/types/category";
 
 const BACKEND_API_URL = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL;
 
-export async function getProductsService(): Promise<Product[]> {
-	const res = await fetch(`${BACKEND_API_URL}/products`, {
+export async function getProductsByCategorySlugService(
+		categorySlug: string,
+		searchParams?: Record<string, string | number | undefined>
+): Promise<CategoryWithProductResponse> {
+	const query = searchParams
+			? '?' + new URLSearchParams(
+			Object.entries(searchParams)
+					.filter(([, value]) => value !== undefined)
+					.map(([key, value]) => [key, String(value)])
+	).toString()
+			: '';
+
+	const res = await fetch(`${BACKEND_API_URL}/categories/${categorySlug}/products${query}`, {
 		next: { revalidate: 3600 }
 	});
 
 	if (!res.ok) {
-		throw new Error('Lấy danh sách sản phẩm thất bại');
+		if (res.status === 404) {
+			throw new Error('Không tìm thấy danh mục sản phẩm');
+		}
+		throw new Error('Lấy danh sách sản phẩm theo danh mục thất bại');
 	}
 
-	const result: ProductListResponse = await res.json();
-	return result.data || [];
+	return res.json();
 }
 
 export async function getProductDetailService(slug: string): Promise<ProductDetail | null> {
@@ -27,4 +41,13 @@ export async function getProductDetailService(slug: string): Promise<ProductDeta
 
 	const result = await res.json();
 	return result.data;
+}
+
+export async function loadMoreProductsAction(categorySlug: string, page: number) {
+	try {
+		return await getProductsByCategorySlugService(categorySlug, {page});
+	} catch (error) {
+		console.error("Lỗi khi load thêm sản phẩm:", error);
+		return null;
+	}
 }

@@ -1,19 +1,7 @@
 const features = [
-	{
-		icon: "flaticon-shipped",
-		title: "Free Delivery",
-		desc: "If you are going to use of Lorem, you need to be sure there anything"
-	},
-	{
-		icon: "flaticon-money-back",
-		title: "30 Day Return",
-		desc: "If you are going to use of Lorem, you need to be sure there anything"
-	},
-	{
-		icon: "flaticon-support",
-		title: "27/4 Support",
-		desc: "If you are going to use of Lorem, you need to be sure there anything"
-	},
+	{ icon: "flaticon-shipped", title: "Giao hàng miễn phí", desc: "Miễn phí vận chuyển cho mọi đơn hàng" },
+	{ icon: "flaticon-money-back", title: "Đổi trả 30 ngày", desc: "Hỗ trợ đổi trả trong vòng 30 ngày" },
+	{ icon: "flaticon-support", title: "Hỗ trợ 24/7", desc: "Tổng đài hỗ trợ khách hàng mọi lúc" },
 ];
 
 export const ShopInfo = () =>

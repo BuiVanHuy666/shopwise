@@ -1,35 +1,36 @@
 "use client"
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
+import Image from "next/image";
 
 const testimonials = [
 	{
 		id: 1,
-		name: "Lissa Castro",
-		role: "Designer",
+		name: "Lê Minh Thư",
+		role: "Nhà thiết kế",
 		img: "user_img1.jpg",
-		text: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. A aliquam amet animi blanditiis consequatur debitis dicta distinctio, enim error eum iste libero modi nam natus perferendis possimus quasi sint sit tempora voluptatem."
+		text: "Sản phẩm thực sự tuyệt vời! Chất liệu vải rất tốt và kiểu dáng đúng như mô tả. Tôi rất hài lòng với trải nghiệm mua sắm tại cửa hàng."
 	},
 	{
 		id: 2,
-		name: "Alden Smith",
-		role: "Designer",
+		name: "Nguyễn Văn Anh",
+		role: "Kiến trúc sư",
 		img: "user_img2.jpg",
-		text: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. A aliquam amet animi blanditiis consequatur debitis dicta distinctio, enim error eum iste libero modi nam natus perferendis possimus quasi sint sit tempora voluptatem."
+		text: "Dịch vụ khách hàng quá xuất sắc. Mình đặt hàng buổi sáng mà chiều đã nhận được. Hàng đóng gói cẩn thận, chỉn chu. Sẽ ủng hộ shop dài dài."
 	},
 	{
 		id: 3,
-		name: "Daisy Lana",
-		role: "Designer",
+		name: "Trần Lan Chi",
+		role: "Người mẫu",
 		img: "user_img3.jpg",
-		text: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. A aliquam amet animi blanditiis consequatur debitis dicta distinctio, enim error eum iste libero modi nam natus perferendis possimus quasi sint sit tempora voluptatem."
+		text: "Mình đã mua nhiều shop nhưng ở đây là ưng nhất. Form áo chuẩn, tôn dáng cực kỳ. Giá cả lại rất phải chăng so với chất lượng."
 	},
 	{
 		id: 4,
-		name: "John Becker",
-		role: "Designer",
+		name: "Phạm Hoàng Nam",
+		role: "Doanh nhân",
 		img: "user_img4.jpg",
-		text: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. A aliquam amet animi blanditiis consequatur debitis dicta distinctio, enim error eum iste libero modi nam natus perferendis possimus quasi sint sit tempora voluptatem."
+		text: "Giao hàng nhanh, tư vấn nhiệt tình. Cửa hàng luôn cập nhật những xu hướng thời trang mới nhất. Mình rất tin tưởng khi đặt mua đồ tại đây."
 	},
 ];
 
@@ -41,7 +42,7 @@ export const Testimonials = () =>
 						<div className="row justify-content-center">
 							<div className="col-md-6">
 								<div className="heading_s1 text-center">
-									<h2>Our Client Say!</h2>
+									<h2>Khách hàng nói về chúng tôi!</h2>
 								</div>
 							</div>
 						</div>
@@ -60,7 +61,7 @@ export const Testimonials = () =>
 												</div>
 												<div className="author_wrap">
 													<div className="author_img">
-														<img src={`assets/images/${t.img}`} alt={t.img}/>
+														<Image src={`/assets/images/${t.img}`} alt={t.img} width={60} height={60}/>
 													</div>
 													<div className="author_name">
 														<h6>{t.name}</h6>

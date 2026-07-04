@@ -11,9 +11,7 @@ type Props = {
 
 export default function Tabs({ description, additionalInfo }: Props) {
 	const [isExpanded, setIsExpanded] = useState<boolean>(false);
-
 	const [needsCollapse, setNeedsCollapse] = useState<boolean>(false);
-
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -24,55 +22,72 @@ export default function Tabs({ description, additionalInfo }: Props) {
 		}
 	}, [description]);
 
+	const hasDescription = !!description && description.trim() !== '';
+	const hasAdditionalInfo = !!additionalInfo && Object.keys(additionalInfo).length > 0;
+
+	const isDescActive = hasDescription;
+	const isAdditionalActive = !hasDescription && hasAdditionalInfo;
+	const isReviewActive = !hasDescription && !hasAdditionalInfo;
+
 	return (
 			<div className="tab-style3">
 				<ul className="nav nav-tabs" role="tablist">
-					<li className="nav-item">
-						<a
-								className="nav-link active"
-								id="Description-tab"
-								data-bs-toggle="tab"
-								href="#Description"
-								role="tab"
-								aria-controls="Description"
-								aria-selected="true"
-						>
-							Mô tả sản phẩm
-						</a>
-					</li>
 
-					<li className="nav-item">
-						<a
-								className="nav-link"
-								id="Additional-info-tab"
-								data-bs-toggle="tab"
-								href="#Additional-info"
-								role="tab"
-								aria-controls="Additional-info"
-								aria-selected="false"
-						>
-							Đặc điểm nổi bật
-						</a>
-					</li>
+					{/* Chỉ render nếu có description */}
+					{hasDescription && (
+							<li className="nav-item">
+								<a
+										className={`nav-link ${isDescActive ? 'active' : ''}`}
+										id="Description-tab"
+										data-bs-toggle="tab"
+										href="#Description"
+										role="tab"
+										aria-controls="Description"
+										aria-selected={isDescActive}
+								>
+									Mô tả sản phẩm
+								</a>
+							</li>
+					)}
 
+					{/* Chỉ render nếu có additionalInfo */}
+					{hasAdditionalInfo && (
+							<li className="nav-item">
+								<a
+										className={`nav-link ${isAdditionalActive ? 'active' : ''}`}
+										id="Additional-info-tab"
+										data-bs-toggle="tab"
+										href="#Additional-info"
+										role="tab"
+										aria-controls="Additional-info"
+										aria-selected={isAdditionalActive}
+								>
+									Đặc điểm nổi bật
+								</a>
+							</li>
+					)}
+
+					{/* Tab Review luôn hiển thị */}
 					<li className="nav-item">
 						<a
-								className="nav-link"
+								className={`nav-link ${isReviewActive ? 'active' : ''}`}
 								id="Reviews-tab"
 								data-bs-toggle="tab"
 								href="#Reviews"
 								role="tab"
 								aria-controls="Reviews"
-								aria-selected="false"
+								aria-selected={isReviewActive}
 						>
 							Đánh giá (2)
 						</a>
 					</li>
 				</ul>
+
 				<div className="tab-content shop_info_tab">
 
-					<div className="tab-pane fade show active" id="Description" role="tabpanel" aria-labelledby="Description-tab">
-						{description && (
+					{/* Chỉ render nếu có description */}
+					{hasDescription && (
+							<div className={`tab-pane fade ${isDescActive ? 'show active' : ''}`} id="Description" role="tabpanel" aria-labelledby="Description-tab">
 								<div className="relative">
 									<div
 											ref={contentRef}
@@ -104,31 +119,33 @@ export default function Tabs({ description, additionalInfo }: Props) {
 											</div>
 									)}
 								</div>
-						)}
-					</div>
+							</div>
+					)}
 
-					<div
-							className="tab-pane fade"
-							id="Additional-info"
-							role="tabpanel"
-							aria-labelledby="Additional-info-tab"
-					>
-						<table className="table table-bordered">
-							<tbody>
-							{
-									additionalInfo && Object.entries(additionalInfo).map(([key, value], index: number) => (
+					{/* Chỉ render nếu có additionalInfo */}
+					{hasAdditionalInfo && (
+							<div
+									className={`tab-pane fade ${isAdditionalActive ? 'show active' : ''}`}
+									id="Additional-info"
+									role="tabpanel"
+									aria-labelledby="Additional-info-tab"
+							>
+								<table className="table table-bordered">
+									<tbody>
+									{Object.entries(additionalInfo).map(([key, value], index: number) => (
 											<tr key={`${key}-${index}`}>
 												<td>{key}</td>
 												<td>{value}</td>
 											</tr>
-									))
-							}
-							</tbody>
-						</table>
-					</div>
+									))}
+									</tbody>
+								</table>
+							</div>
+					)}
 
+					{/* Tab Review luôn hiển thị */}
 					<div
-							className="tab-pane fade"
+							className={`tab-pane fade ${isReviewActive ? 'show active' : ''}`}
 							id="Reviews"
 							role="tabpanel"
 							aria-labelledby="Reviews-tab"
@@ -138,6 +155,7 @@ export default function Tabs({ description, additionalInfo }: Props) {
 								2 Review For
 								<span>Blue Dress For Woman</span>
 							</h5>
+							{/* ... (Giữ nguyên nội dung html của phần Review như cũ) ... */}
 							<ul className="list_none comment_list mt-4">
 								<li>
 									<div className="comment_img">

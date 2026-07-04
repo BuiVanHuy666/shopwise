@@ -9,11 +9,11 @@ export const SummerBanner = () => {
 							<div className="medium_divider d-none d-md-block clearfix"></div>
 							<div className="trand_banner_text text-center text-md-start">
 								<div className="heading_s1 mb-3">
-									<span className="sub_heading">New season trends!</span>
-									<h2>Best Summer Collection</h2>
+									<span className="sub_heading">Xu hướng mùa mới!</span>
+									<h2>Bộ sưu tập mùa hè</h2>
 								</div>
-								<h5 className="mb-4">Sale Get up to 50% Off</h5>
-								<a href="" className="btn btn-fill-out rounded-0">Shop Now</a>
+								<h5 className="mb-4">Giảm giá lên đến 50%</h5>
+								<a href="" className="btn btn-fill-out rounded-0">Mua ngay</a>
 							</div>
 							<div className="medium_divider clearfix"></div>
 						</div>

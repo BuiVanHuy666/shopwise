@@ -45,7 +45,7 @@ export default function Gallery({ colorOptions, selectedColorId, activeImageInde
 								modules={[FreeMode, Thumbs]}
 								observer={true}
 								observeParents={true}
-								className="mySwiper2 border rounded overflow-hidden"
+								className="mySwiper2 border rounded overflow-hidden ojbect-cover ojbect-center"
 						>
 							{displayImages.map((src, index) => (
 									<SwiperSlide key={`${selectedColorId}-main-${index}`}>
@@ -62,12 +62,11 @@ export default function Gallery({ colorOptions, selectedColorId, activeImageInde
 															onClick={open}
 													>
 														<Image
-																ref={ref as any}
+																ref={ref}
 																src={getHiddenImageUrl(src, 'colors')}
 																alt={`product-main-${index}`}
 																fill
-																className="object-cover"
-																sizes="(max-width: 768px) 100vw, 50vw"
+																className="ojbect-cover ojbect-center"
 														/>
 													</div>
 											)}

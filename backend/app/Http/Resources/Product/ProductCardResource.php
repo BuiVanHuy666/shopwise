@@ -8,29 +8,28 @@ use Illuminate\Support\Str;
 
 class ProductCardResource extends JsonResource
 {
-    public function toArray(Request $request): array
+    public function toArray($request): array
     {
-        $discountPercent = 0;
-        if ($this->sale_price && $this->price > 0 && $this->sale_price < $this->price) {
-            $discountPercent = round((($this->price - $this->sale_price) / $this->price) * 100);
-        }
+        $activeColors = $request->input('colors', []);
+
+        $thumbnailColor = !empty($activeColors)
+            ? $this->colors->firstWhere('color_group', $activeColors[0]) ?? $this->colors->first()
+            : $this->colors->first();
 
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'slug' => $this->slug,
-            'thumbnail' => $this->thumbnail,
-
-            'price' => (float)$this->price,
-            'sale_price' => $this->sale_price ? (float)$this->sale_price : null,
-            'discount_percent' => $discountPercent,
-
-            'short_description' => $this->headline,
-
-            'colors' => $this->colors->pluck('color_hex')->unique()->values(),
-
-            'rating_stars' => 4.5,
-            'reviews_count' => rand(10, 50),
+            'id'        => $this->id,
+            'name'      => $this->name,
+            'slug'      => $this->slug,
+            'price'     => $this->price,
+            'sale_price'=> $this->sale_price,
+            'thumbnail' => $thumbnailColor?->images->first()->image,
+            'colors'    => $this->colors->map(fn ($c) => [
+                'color_group' => $c->color_group,
+                'color_hex'   => $c->color_hex,
+                'image_url'   => $c->image_url,
+            ]),
+            'rating_stars' => random_int(30, 50) / 10,
+            'reviews_count' => random_int(10, 1000)
         ];
     }
 }

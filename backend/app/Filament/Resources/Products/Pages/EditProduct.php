@@ -30,10 +30,6 @@ class EditProduct extends EditRecord
     {
         $record = $this->record;
 
-        if (!empty($record->thumbnail)) {
-            $data['thumbnail'] = Product::THUMBNAIL_DIR . '/' . $record->thumbnail;
-        }
-
         $colors = $record->colors()->with('images')->get();
         $data['colors'] = $colors->map(function ($color) {
             return [
@@ -82,12 +78,6 @@ class EditProduct extends EditRecord
     }
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        if (!empty($data['thumbnail'])) {
-            $data['thumbnail'] = is_array($data['thumbnail'])
-                ? reset($data['thumbnail'])
-                : $data['thumbnail'];
-        }
-
         if (isset($data['colors']) && is_array($data['colors'])) {
             foreach ($data['colors'] as $key => $color) {
                 if (isset($color['images']) && is_array($color['images'])) {

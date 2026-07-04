@@ -18,14 +18,10 @@ class ProductService
     public function create(array $data): Product
     {
         return DB::transaction(function () use ($data) {
-            $thumbPath  = is_array($data['thumbnail']) ? reset($data['thumbnail']) : ($data['thumbnail'] ?? '');
-            $thumbName  = $this->imageService->processAndMove((string) $thumbPath, Product::THUMBNAIL_DIR);
-
             $product = Product::create([
                 'name'            => $data['name'],
                 'slug'            => $data['slug'],
                 'category_id'     => $data['category_id'],
-                'thumbnail'       => $thumbName,
                 'headline'        => $data['headline'],
                 'description'     => $data['description'] ?? null,
                 'price'           => $data['price'],
@@ -84,16 +80,10 @@ class ProductService
     public function update(Product $product, array $data): Product
     {
         return DB::transaction(function () use ($product, $data) {
-            // ── Thumbnail ──────────────────────────────────────────────────
-            $thumbRaw  = $data['thumbnail'] ?? $product->thumbnail;
-            $thumbPath = is_array($thumbRaw) ? reset($thumbRaw) : (string) $thumbRaw;
-            $thumbName = $this->imageService->processAndMove($thumbPath, Product::THUMBNAIL_DIR);
-
             $product->update([
                 'name'            => $data['name'],
                 'slug'            => $data['slug'],
                 'category_id'     => $data['category_id'],
-                'thumbnail'       => $thumbName,
                 'headline'        => $data['headline'],
                 'description'     => $data['description'] ?? null,
                 'price'           => $data['price'],
@@ -129,7 +119,6 @@ class ProductService
                     $tempIdToDbId[$colorData['_temp_id']] = $color->id;
                 }
 
-                // Sync images
                 $existingImages  = $color->images()->get()->keyBy('id');
                 $submittedImgIds = [];
 

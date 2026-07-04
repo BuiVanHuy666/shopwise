@@ -15,7 +15,6 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
     'category_id',
     'name',
     'slug',
-    'thumbnail',
     'headline',
     'description',
     'additional_info',
@@ -27,7 +26,6 @@ class Product extends Model
 {
     use SoftDeletes;
 
-    const string THUMBNAIL_DIR = 'products/thumbnails';
     const string COLOR_IMAGE_DIR = 'products/colors';
 
     protected $casts = [
@@ -80,17 +78,17 @@ class Product extends Model
         return $query->whereBetween('price', [$from, $to]);
     }
 
-    public function scopeColors(Builder $query, array $colors): Builder|QueryBuilder
+    public function scopeColor(Builder $query, string $color): Builder|QueryBuilder
     {
-        return $query->whereHas('colors', function (Builder $query) use ($colors) {
-            $query->whereIn('color_group', $colors);
+        return $query->whereHas('colors', function (Builder $query) use ($color) {
+            $query->where('color_group', $color);
         });
     }
 
-    public function scopeSizes(Builder $query, array $sizes): Builder|QueryBuilder
+    public function scopeSize(Builder $query, string $size): Builder|QueryBuilder
     {
-        return $query->whereHas('variants.attributeValues', function (Builder $query) use ($sizes) {
-            $query->whereIn('value', $sizes);
+        return $query->whereHas('variants.attributeValues', function (Builder $query) use ($size) {
+            $query->where('value', $size);
         });
     }
 }

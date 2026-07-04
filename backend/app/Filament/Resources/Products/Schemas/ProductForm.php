@@ -54,14 +54,6 @@ class ProductForm
                                  ->searchable()
                                  ->preload(),
 
-                           FileUpload::make('thumbnail')
-                                     ->disk('public')
-                                     ->label('Ảnh đại diện')
-                                     ->image()
-                                     ->directory(Product::THUMBNAIL_DIR)
-                                     ->storeFileNamesIn('thumbnail')
-                                     ->required(),
-
                            TextInput::make('headline')
                                     ->label('Tiêu đề ngắn')
                                     ->required()

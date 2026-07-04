@@ -15,6 +15,7 @@ return new class extends Migration
 
             $table->string('color_name');
             $table->string('color_hex');
+            $table->tinyInteger('sort_order')->default(0);
             $table->timestamps();
         });
     }

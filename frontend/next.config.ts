@@ -7,10 +7,6 @@ const nextConfig: NextConfig = {
 				source: '/uploads/colors/:path*',
 				destination: `${process.env.BACKEND_URL}/storage/products/colors/:path*`,
 			},
-			{
-				source: '/uploads/thumbnails/:path*',
-				destination: `${process.env.BACKEND_URL}/storage/products/thumbnails/:path*`,
-			},
 		]
 	},
 };

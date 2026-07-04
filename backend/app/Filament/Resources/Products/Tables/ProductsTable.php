@@ -28,9 +28,6 @@ class ProductsTable
                     ->searchable(),
                 TextColumn::make('slug')
                     ->searchable(),
-                TextColumn::make('thumbnail')
-                    ->label('Ảnh bìa')
-                    ->searchable(),
                 TextColumn::make('price')
                     ->label('Giá cơ bản')
                     ->money()

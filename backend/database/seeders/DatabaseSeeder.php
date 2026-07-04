@@ -25,7 +25,14 @@ class DatabaseSeeder extends Seeder
         DB::transaction(function () use ($sql) {
             DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
-            DB::unprepared($sql);
+            $statements = array_filter(
+                array_map('trim', explode("\n", $sql)),
+                fn($s) => $s !== ''
+            );
+
+            foreach ($statements as $statement) {
+                DB::unprepared(rtrim($statement, ';'));
+            }
 
             DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         });

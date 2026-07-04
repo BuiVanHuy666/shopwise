@@ -9,9 +9,15 @@ export interface Product {
 	sale_price: number | null;
 	discount_percent: number;
 	short_description: string;
-	colors: string[];
+	colors: ProductCardColor[];
 	rating_stars: number;
 	reviews_count: number;
+}
+
+export interface ProductCardColor {
+	color_group: string;
+	color_hex: string;
+	image_url: string;
 }
 
 export interface ProductColorOption {

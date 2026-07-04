@@ -15,7 +15,6 @@ return new class extends Migration
 
             $table->string('name');
             $table->string('slug')->unique();
-            $table->string('thumbnail');
             $table->string('headline', 512);
             $table->text('description')->nullable();
             $table->json('additional_info')->nullable();

@@ -1,6 +1,6 @@
 import { UploadType } from "@/types/product";
 
-export const getHiddenImageUrl = (filename: string, type: UploadType = 'thumbnails') =>
+export const getHiddenImageUrl = (filename: string, type: UploadType = 'colors') =>
 		`/uploads/${type}/${filename}`;
 
 export const formatCurrency = (amount: number) => {

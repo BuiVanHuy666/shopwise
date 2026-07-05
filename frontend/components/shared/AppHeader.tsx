@@ -132,6 +132,10 @@ export const AppHeader = async () =>
 												</p>
 											</div>
 										</div>
+
+									</li>
+									<li>
+										<Link href="/account"><i className="linearicons-user"></i></Link>
 									</li>
 								</ul>
 							</nav>

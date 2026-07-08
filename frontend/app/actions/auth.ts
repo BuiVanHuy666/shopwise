@@ -2,12 +2,25 @@
 
 import { cookies } from "next/headers";
 import { RegisterSchema } from "@/validations/register.schema";
+import { LoginSchema } from "@/validations/login.schema";
+import { redirect } from "next/navigation";
+import {ForgotPasswordSchema} from "@/validations/forgotPassword.schema";
+import { api } from "@/libs/api";
+import { ForgotPasswordResponse, LoginResponse, RegisterResponse } from "@/types/api";
+import { handleActionError, storeAccessToken } from "@/utils/helper";
+import { validateForm } from "@/utils/validate";
+
+export interface User {
+	email: string;
+	name: string;
+	is_verified: boolean;
+}
 
 export interface ActionState {
 	status: "idle" | "success" | "error";
 	message: string;
 	errors?: Record<string, string[]> | null;
-	oldValues?: { name: string; email: string; accepted: boolean };
+	oldValues?: Record<string, unknown>;
 }
 
 export const registerAction = async (_prev: ActionState | null, formData: FormData): Promise<ActionState> => {
@@ -18,65 +31,120 @@ export const registerAction = async (_prev: ActionState | null, formData: FormDa
 		password_confirmation: formData.get("password_confirmation") as string,
 		accepted: formData.get("accepted"),
 	};
+
 	const oldValues = { name: rawFormData.name, email: rawFormData.email, accepted: rawFormData.accepted !== null };
 
-	const validatedFields = RegisterSchema.safeParse(rawFormData);
-
-	if (!validatedFields.success) {
-		return {
-			status: "error",
-			message: "Vui lòng kiểm tra lại các thông tin đã nhập.",
-			errors: validatedFields.error.flatten().fieldErrors,
-			oldValues,
-		};
-	}
-
 	try {
-		const response = await fetch(`${process.env.BACKEND_API_URL}/auth/register`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				"Accept": "application/json",
-			},
-			body: JSON.stringify({
-				name: validatedFields.data.name,
-				email: validatedFields.data.email,
-				password: validatedFields.data.password,
-				password_confirmation: validatedFields.data.password_confirmation,
-			})
-		});
+		const validatedData = validateForm(RegisterSchema, rawFormData);
+		const response = await api.post<RegisterResponse>("/auth/register", validatedData);
 
-		const data = await response.json();
-
-		if (!response.ok) {
-			return {
-				status: "error",
-				message: data.message || "Đăng ký thất bại",
-				errors: data.errors || null,
-				oldValues
-			};
-		}
-
-		if (data.access_token) {
-			(await cookies()).set("access_token", data.access_token, {
-				httpOnly: true,
-				secure: process.env.NODE_ENV === "production",
-				path: "/",
-				maxAge: 60 * 60 * 24 * 7,
-			});
+		if (response.access_token) {
+			await storeAccessToken(response.access_token);
 		}
 
 		return {
 			status: "success",
-			message: data.message || "Đăng ký tài khoản thành công!",
+			message: response.message || "Đăng ký tài khoản thành công!",
 		};
 
 	} catch (error) {
-		console.error("Error during registration:", error);
-		return {
-			status: "error",
-			message: "Không thể kết nối đến máy chủ. Vui lòng thử lại sau.",
-			oldValues
-		};
+		return handleActionError(error, oldValues);
 	}
 }
+
+export const loginAction = async (_prev: ActionState | null, formData: FormData): Promise<ActionState> => {
+	const rawFormData = {
+		email: formData.get("email") as string,
+		password: formData.get("password") as string,
+	};
+
+	const oldValues = { email: rawFormData.email, accepted: false };
+
+	try {
+		const validatedFields = validateForm(LoginSchema, rawFormData);
+		const response = await api.post<LoginResponse>("/auth/login", validatedFields);
+
+		if (response.access_token) {
+			await storeAccessToken(response.access_token);
+		}
+
+		return { status: "success", message: response.message || "Đăng nhập thành công!" };
+	} catch (error) {
+		return handleActionError(error, oldValues);
+	}
+}
+
+export const logoutAction = async () => {
+	const cookieStore = await cookies();
+	const token = cookieStore.get("access_token")?.value;
+
+	if (token) {
+		try {
+			await api.post("/auth/logout");
+		} catch (error) {
+			console.error("Lỗi khi gọi API logout backend:", error);
+		}
+	}
+
+	cookieStore.delete("access_token");
+
+	redirect("/login");
+};
+
+export const getCurrentUserAction = async (): Promise<User | null> => {
+	const token = (await cookies()).get("access_token")?.value;
+
+	if (!token) {
+		return null;
+	}
+
+	try {
+		return api.get<User>("/auth/me", { cache: "no-store"});
+	}catch (error) {
+		console.error("Lỗi khi lấy thông tin user:", error);
+		return null;
+	}
+};
+
+export const forgotPasswordAction = async (_prev: ActionState | null, formData: FormData): Promise<ActionState> => {
+	const rawFormData = {
+		email: formData.get("email") as string,
+	};
+	const oldValues = { name: "", email: rawFormData.email, accepted: false };
+
+	try {
+		const validatedData = validateForm(ForgotPasswordSchema, rawFormData);
+		const response = await api.post<ForgotPasswordResponse>('/auth/forgot-password', validatedData);
+
+		return {
+			status: "success",
+			message: response.message,
+		};
+	} catch (error) {
+		return handleActionError(error, oldValues);
+	}
+}
+
+export const resendVerificationAction = async (): Promise<ActionState> => {
+	const cookieStore = await cookies();
+	const token = cookieStore.get("access_token")?.value;
+
+	if (!token) {
+		return {
+			status: "error",
+			message: "Phiên đăng nhập đã hết hạn.",
+		};
+	}
+
+	try {
+		const response = await api.post<{message: string}>("/auth/email/resend");
+
+		return {
+			status: "success",
+			message: response.message || "Đã gửi lại email thành công!",
+		};
+
+	} catch (error) {
+		return handleActionError(error);
+	}
+};

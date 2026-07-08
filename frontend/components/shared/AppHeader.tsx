@@ -2,10 +2,12 @@ import Image from "next/image";
 import { Category } from "@/types/category";
 import Link from "next/link";
 import { getCategoriesService } from "@/services/category";
+import { getCurrentUserAction, logoutAction } from "@/app/actions/auth";
 
 export const AppHeader = async () =>
 	{
 		const categories: Category[] = await getCategoriesService();
+		const user = await getCurrentUserAction();
 		return (
 				<header className="header_wrap fixed-top header_with_topbar">
 					<div className="bottom_header dark_skin main_menu_uppercase">
@@ -134,9 +136,36 @@ export const AppHeader = async () =>
 										</div>
 
 									</li>
-									<li>
-										<Link href="/account"><i className="linearicons-user"></i></Link>
-									</li>
+
+									{user ? (
+											<li className="dropdown">
+												<a className="nav-link nav_item" href="#" data-bs-toggle="dropdown">
+													<i className="linearicons-user"></i>
+												</a>
+												<div className="dropdown-menu dropdown-menu-right" style={{ minWidth: '180px' }}>
+													<Link className="dropdown-item" href="/account">
+														Dashboard
+													</Link>
+
+													<div className="dropdown-divider"></div>
+													<form action={logoutAction} className="m-0">
+														<button
+																type="submit"
+																className="dropdown-item text-danger"
+																style={{ background: "transparent", border: "none", width: "100%", textAlign: "left", cursor: "pointer" }}
+														>
+															Đăng xuất
+														</button>
+													</form>
+												</div>
+											</li>
+									) : (
+											<li>
+												<Link href="/login" className="nav-link nav_item d-flex align-items-center">
+													<i className="linearicons-user" style={{ marginRight: '5px', fontSize: '18px' }}></i> Đăng Nhập
+												</Link>
+											</li>
+									)}
 								</ul>
 							</nav>
 						</div>

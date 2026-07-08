@@ -2,7 +2,9 @@ import { z } from "zod";
 
 export const RegisterSchema = z.object({
 	name: z.string().min(2, { message: "Tên phải có ít nhất 2 ký tự." }),
-	email: z.string().email({ message: "Địa chỉ email không hợp lệ." }),
+	email: z.string({message: "Vui lòng nhập địa chỉ email."})
+			.min(1, {message: "Vui lòng nhập địa chỉ email."})
+			.email({message: "Địa chỉ email không hợp lệ."}),
 	password: z.string().min(8, { message: "Mật khẩu phải có ít nhất 8 ký tự." }),
 	password_confirmation: z.string(),
 	accepted: z.any().refine((val) => val === "accepted", {

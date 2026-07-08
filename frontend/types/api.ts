@@ -1,3 +1,5 @@
+import { User } from "@/types/user";
+
 export interface PaginationResponse<T> {
 	data: T,
 	links: {
@@ -15,4 +17,26 @@ export interface PaginationResponse<T> {
 		to: number;
 		total: number;
 	};
+}
+
+export interface LoginResponse {
+	access_token: string,
+	message: string,
+	token_type: string,
+	expires_in: number,
+	user: User,
+	errors: Record<string, unknown>[],
+	oldValues: Record<string, unknown>[],
+}
+
+export interface RegisterResponse {
+	message: string
+	access_token: string
+	token_type: string
+	user: User
+}
+
+export interface ForgotPasswordResponse {
+	message: string
+	errors?: Record<string, string>[]
 }

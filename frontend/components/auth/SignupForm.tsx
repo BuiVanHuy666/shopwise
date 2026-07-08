@@ -13,12 +13,7 @@ export const SignupForm = () =>
 		useEffect(() => {
 			if (state?.status === "success") {
 				toast.success(state.message);
-				setTimeout(() => {
-					router.push("/");
-				}, 1500);
-
-			} else if (state?.status === "error" && !state.errors) {
-				toast.error(state.message);
+				router.push("/");
 			}
 		}, [state, router]);
 
@@ -29,7 +24,7 @@ export const SignupForm = () =>
 								{state.message}
 							</div>
 					)}
-					<form action={formAction} method="POST">
+					<form action={formAction} noValidate>
 						<div className="form-group mb-3">
 							<input
 									type="text"

@@ -26,22 +26,17 @@ function VerifyEmailContent() {
 			},
 		})
 				.then(async (response) => {
-					// Chuyển đổi response thành JSON
 					const data = await response.json();
 
-					// fetch không tự nhảy vào catch nếu lỗi 4xx, 5xx, nên ta phải tự check
 					if (!response.ok) {
 						throw new Error(data.message || "Xác thực thất bại.");
 					}
 
-					// Thành công (Status 200-299)
 					setStatus("success");
 					setMessage(data.message || "Xác thực email thành công!");
 				})
 				.catch((error) => {
-					// Thất bại
 					setStatus("error");
-					// Vì ta đã throw new Error ở trên, ta có thể lấy error.message
 					setMessage(
 							error.message ||
 							"Xác thực thất bại. Đường dẫn có thể đã hết hạn hoặc đã bị lỗi mạng."
@@ -76,11 +71,11 @@ function VerifyEmailContent() {
             </div>
 
             {status !== "loading" && (
-                <div className="form-group mb-3 text-center">
-                    <Link href="/login" className="btn btn-fill-out btn-block">
-                        Đi đến trang Đăng nhập
-                    </Link>
-                </div>
+		            <div className="form-group mb-3 text-center">
+			            <Link href="/" className="btn btn-fill-out btn-block">
+				            Tiếp tục mua sắm
+			            </Link>
+		            </div>
             )}
         </>
     );

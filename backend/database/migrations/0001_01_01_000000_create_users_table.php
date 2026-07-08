@@ -22,7 +22,6 @@ return new class extends Migration
             $table->unique(['provider_name', 'provider_id']);
 
             $table->string('phone_number', 20)->nullable()->unique();
-            $table->string('avatar')->nullable();
 
             $table->enum('role', ['user', 'admin'])->default('user');
             $table->boolean('is_active')->default(true);

@@ -3,23 +3,26 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Resources\User\AuthUserResource;
 use App\Services\Auth\RegisterService;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
 class RegisterController
 {
-    public function store(RegisterRequest $request, RegisterService $registerService)
+    public function __invoke(RegisterRequest $request, RegisterService $registerService): JsonResponse
     {
         try {
             $result = $registerService($request->validated());
 
             return response()->json([
-                'message' => 'Đăng ký thành công. Vui lòng kiểm tra email để kích hoạt tài khoản.',
+                'message' => 'Đăng ký thành công! Chào mừng bạn.',
                 'access_token' => $result['token'],
                 'token_type' => 'bearer',
-                'user' => $result['user'],
+                'user' => new AuthUserResource($result['user']),
             ], 201);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::channel('authentication')->error('Lỗi đăng ký tài khoản:', [
                 'email' => $request->input('email'),
                 'error_message' => $e->getMessage(),

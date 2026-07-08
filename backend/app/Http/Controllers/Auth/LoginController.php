@@ -13,9 +13,10 @@ class LoginController extends Controller
 {
     public function __invoke(Request $request): JsonResponse
     {
-        $credentials = $request->validate([
+        $request->validate([
             'email' => 'required|email',
             'password' => 'required|string|min:8',
+            'remember' => 'boolean',
         ], [
             'email.required' => 'Email là bắt buộc.',
             'email.email' => 'Email không hợp lệ.',
@@ -24,8 +25,14 @@ class LoginController extends Controller
             'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
         ]);
 
+        $credentials = $request->only('email', 'password');
+
+        $remember = $request->boolean('remember');
+
         try {
-            if (!$token = auth('api')->attempt($credentials)) {
+            $ttl = $remember ? 20160 : config('jwt.ttl');
+
+            if (!$token = auth('api')->setTTL($ttl)->attempt($credentials)) {
                 return response()->json([
                     'message' => 'Email hoặc mật khẩu không chính xác.',
                     'errors' => [
@@ -50,10 +57,9 @@ class LoginController extends Controller
                 'message' => 'Đăng nhập thành công!',
                 'access_token' => $token,
                 'token_type' => 'bearer',
-                'expires_in' => auth('api')->factory()->getTTL() * 60,
+                'expires_in' => $ttl * 60,
                 'user' => new AuthUserResource($user),
             ]);
-
         } catch (Exception $e) {
             Log::channel('authentication')->error('Lỗi đăng nhập:', [
                 'email' => $request->input('email'),

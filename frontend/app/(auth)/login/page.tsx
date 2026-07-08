@@ -1,5 +1,6 @@
 import { LoginForm } from "@/components/auth/LoginForm";
 import Link from "next/link";
+import { SocialAuth } from "@/components/auth/SocialAuth";
 
 export default async function LoginPage()
 	{
@@ -13,18 +14,7 @@ export default async function LoginPage()
 					<div className="different_login">
 						<span> hoặc</span>
 					</div>
-					<ul className="btn-login list_none text-center">
-						<li>
-							<a href="#" className="btn btn-facebook">
-								<i className="ion-social-facebook"></i> Facebook
-							</a>
-						</li>
-						<li>
-							<a href="#" className="btn btn-google">
-								<i className="ion-social-googleplus"></i> Google
-							</a>
-						</li>
-					</ul>
+					<SocialAuth/>
 					<div className="form-note text-center">
 						{"Bạn chưa có tài khoản?"}
 						<Link href="/signup"> Đăng ký ngay</Link>

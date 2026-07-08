@@ -12,7 +12,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-#[Fillable(['name', 'email', 'password', 'provider_name', 'provider_id', 'phone_number', 'avatar'])]
+#[Fillable(['name', 'email', 'password', 'provider_name', 'provider_id', 'phone_number', 'avatar', 'email_verified_at'])]
 #[Hidden(['password', 'remember_token', 'provider_id', 'provider_name'])]
 class User extends Authenticatable implements JWTSubject, MustVerifyEmail
 {

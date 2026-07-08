@@ -57,6 +57,7 @@ export const loginAction = async (_prev: ActionState | null, formData: FormData)
 	const rawFormData = {
 		email: formData.get("email") as string,
 		password: formData.get("password") as string,
+		remember: formData.get("remember") === "yes",
 	};
 
 	const oldValues = { email: rawFormData.email, accepted: false };
@@ -66,7 +67,7 @@ export const loginAction = async (_prev: ActionState | null, formData: FormData)
 		const response = await api.post<LoginResponse>("/auth/login", validatedFields);
 
 		if (response.access_token) {
-			await storeAccessToken(response.access_token);
+			await storeAccessToken(response.access_token, rawFormData.remember);
 		}
 
 		return { status: "success", message: response.message || "Đăng nhập thành công!" };
@@ -172,11 +173,11 @@ export const resetPasswordAction = async (_prev: ActionState | null, formData: F
 	}
 }
 
-export const storeAccessToken = async (token: string) => {
+export const storeAccessToken = async (token: string, remember: boolean = false) => {
 	(await cookies()).set("access_token", token, {
 		httpOnly: true,
 		secure: process.env.NODE_ENV === "production",
 		path: "/",
-		maxAge: 60 * 60 * 24 * 7,
+		maxAge: remember ? 60 * 60 * 24 * 14 : 60 * 60 * 24,
 	});
 };

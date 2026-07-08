@@ -1,4 +1,5 @@
 import { SignupForm } from "@/components/auth/SignupForm";
+import { SocialAuth } from "@/components/auth/SocialAuth";
 
 export default function SignupPage() {
 
@@ -13,18 +14,7 @@ export default function SignupPage() {
 				<div className="different_login">
 					<span> hoặc</span>
 				</div>
-				<ul className="btn-login list_none text-center">
-					<li>
-						<a href="#" className="btn btn-facebook">
-							<i className="ion-social-facebook"></i> Facebook
-						</a>
-					</li>
-					<li>
-						<a href="#" className="btn btn-google">
-							<i className="ion-social-googleplus"></i> Google
-						</a>
-					</li>
-				</ul>
+				<SocialAuth/>
 				<div className="form-note text-center">
 					Bạn đã có tài khoản?
 					<a href="/login"> Đăng nhập</a>

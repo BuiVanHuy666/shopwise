@@ -15,8 +15,7 @@ export const AppHeader = async () =>
 						<div className="container">
 							<nav className="navbar navbar-expand-lg">
 								<Link className="navbar-brand" href="/">
-									<Image className="logo_dark" src="/assets/images/logo_dark.png" alt="logo" width={182} height={47}/>
-									<Image className="logo_light" src="/assets/images/logo_light.png" alt="logo" width={182} height={47}/>
+									<Image className="logo_dark" src="/assets/images/logo_dark.png" alt="logo" width={182} height={47} loading="eager"/>
 								</Link>
 								<button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-expanded="false">
 									<span className="ion-android-menu"></span>
@@ -71,7 +70,7 @@ export const AppHeader = async () =>
 																	</div>
 																	<div className="col-sm-4">
 																		<div className="header-banner">
-																			<Image src="/assets/images/menu_banner2.jpg" alt="menu_banner2" width={351} height={190}/>
+																			<Image src="/assets/images/menu_banner2.jpg" alt="menu_banner2" width={351} height={190} loading="eager"/>
 																			<div className="banne_info">
 																				<h6>15% Off</h6>
 																				<h4>{"Men's Fashion"}</h4>

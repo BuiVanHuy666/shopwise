@@ -5,10 +5,11 @@ import { RegisterSchema } from "@/validations/register.schema";
 import { LoginSchema } from "@/validations/login.schema";
 import { redirect } from "next/navigation";
 import {ForgotPasswordSchema} from "@/validations/forgotPassword.schema";
-import { api } from "@/libs/api";
+import { api, ApiError } from "@/libs/api";
 import { ForgotPasswordResponse, LoginResponse, RegisterResponse } from "@/types/api";
-import { handleActionError, storeAccessToken } from "@/utils/helper";
+import { handleActionError } from "@/utils/helper";
 import { validateForm } from "@/utils/validate";
+import { ResetPasswordSchema } from "@/validations/resetPassword.schema";
 
 export interface User {
 	email: string;
@@ -99,9 +100,12 @@ export const getCurrentUserAction = async (): Promise<User | null> => {
 	}
 
 	try {
-		return api.get<User>("/auth/me", { cache: "no-store"});
-	}catch (error) {
-		console.error("Lỗi khi lấy thông tin user:", error);
+		return await api.get<User>("/auth/me", { cache: "no-store"});
+	} catch (error) {
+		const apiError = error as ApiError;
+		if (apiError.status !== 401) {
+			console.error("Lỗi khi lấy thông tin user:", apiError.message ?? error);
+		}
 		return null;
 	}
 };
@@ -147,4 +151,32 @@ export const resendVerificationAction = async (): Promise<ActionState> => {
 	} catch (error) {
 		return handleActionError(error);
 	}
+};
+
+export const resetPasswordAction = async (_prev: ActionState | null, formData: FormData): Promise<ActionState> => {
+	const rawFormData = Object.fromEntries(formData);
+
+	const oldValues = { email: rawFormData.email as string };
+
+	try {
+		const validatedData = validateForm(ResetPasswordSchema, rawFormData);
+
+		const response = await api.post<{message: string}>('/auth/reset-password', validatedData);
+
+		return {
+			status: "success",
+			message: response.message || "Đặt lại mật khẩu thành công!",
+		};
+	} catch (error) {
+		return handleActionError(error, oldValues);
+	}
+}
+
+export const storeAccessToken = async (token: string) => {
+	(await cookies()).set("access_token", token, {
+		httpOnly: true,
+		secure: process.env.NODE_ENV === "production",
+		path: "/",
+		maxAge: 60 * 60 * 24 * 7,
+	});
 };

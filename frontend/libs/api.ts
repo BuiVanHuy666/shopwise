@@ -1,5 +1,6 @@
+import "server-only"
+
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 export interface ApiError {
 	status: number;
@@ -41,11 +42,6 @@ async function fetchApi<T>(endpoint: string, options: RequestInit): Promise<T> {
 	}
 
 	if (!response.ok) {
-		if (response.status === 401 && !endpoint.includes('/auth/login')) {
-			cookieStore.delete("access_token");
-			redirect("/login");
-		}
-
 		const errorData = await response.json().catch(() => ({}));
 
 		throw {

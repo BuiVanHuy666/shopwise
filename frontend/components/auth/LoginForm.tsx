@@ -13,6 +13,7 @@ export const LoginForm = () => {
 	useEffect(() => {
 		if (state?.status === "success") {
 			toast.success(state.message);
+			router.push("/");
 		}
 	}, [state, router]);
 
@@ -31,7 +32,7 @@ export const LoginForm = () => {
 								className={`form-control ${state?.errors?.email ? 'is-invalid' : ''}`}
 								name="email"
 								placeholder="Địa chỉ Email"
-								defaultValue={state?.oldValues?.email || ""}
+								defaultValue={state?.oldValues?.email as string  || ""}
 								autoComplete="email"
 						/>
 						{state?.errors?.email && (

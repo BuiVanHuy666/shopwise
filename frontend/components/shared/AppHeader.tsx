@@ -6,8 +6,9 @@ import { getCurrentUserAction, logoutAction } from "@/app/actions/auth";
 
 export const AppHeader = async () =>
 	{
-		const categories: Category[] = await getCategoriesService();
+		const categories: Category[] = await getCategoriesService().catch(() => []);
 		const user = await getCurrentUserAction();
+
 		return (
 				<header className="header_wrap fixed-top header_with_topbar">
 					<div className="bottom_header dark_skin main_menu_uppercase">

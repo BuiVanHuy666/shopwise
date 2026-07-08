@@ -15,13 +15,12 @@ export async function proxy(request: NextRequest) {
 	// ==========================================
 	// TRƯỜNG HỢP 1: CHƯA ĐĂNG NHẬP
 	// ==========================================
-	if (!token) {
-		// Cố tình vào trang bảo mật hoặc trang verify -> Đuổi về Login
-		if (isProtectedRoute || pathname === '/verify-notice') {
-			return NextResponse.redirect(new URL('/login', request.url));
-		}
-		return NextResponse.next(); // Cho phép đi tiếp (vào trang chủ, giỏ hàng...)
+	if (!token || (token && isTokenExpired(token))) {
+		const response = NextResponse.next()
+		response.cookies.delete('access_token')
+		return response
 	}
+
 
 	// ==========================================
 	// TRƯỜNG HỢP 2: ĐÃ ĐĂNG NHẬP
@@ -87,3 +86,12 @@ export const config = {
 		'/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
 	],
 };
+
+function isTokenExpired(token: string): boolean {
+	try {
+		const payload = JSON.parse(atob(token.split('.')[1]))
+		return Date.now() >= payload.exp * 1000
+	} catch {
+		return true
+	}
+}

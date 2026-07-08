@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $sqlPath = database_path('data.sql');
+        $sqlPath = database_path('datas/data.sql');
 
         if (!File::exists($sqlPath)) {
             $this->command->error("Không tìm thấy file SQL tại: {$sqlPath}");

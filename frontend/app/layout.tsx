@@ -16,6 +16,8 @@ import React, { Suspense } from "react";
 import { AppHeader } from "@/components/shared/AppHeader";
 import { AppFooter } from "@/components/shared/AppFooter";
 import Loading from "@/app/loading";
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const roboto = Roboto({
 	weight: ['100', '300', '400', '500', '700', '900'],
@@ -54,6 +56,11 @@ export default async function RootLayout({children}: Readonly<{
 					<AppFooter/>
 				</Suspense>
 
+				<ToastContainer
+						position="top-right"
+						autoClose={3000}
+						hideProgressBar={false}
+				/>
 				<Script src="/assets/js/jquery-3.7.1.min.js" strategy="beforeInteractive"/>
 				<Script src="/assets/js/popper.min.js" strategy="lazyOnload"/>
 				<Script src="/assets/js/bootstrap.min.js" strategy="lazyOnload"/>

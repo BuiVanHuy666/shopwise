@@ -16,10 +16,30 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('password')->nullable();
+            $table->string('provider_name')->nullable();
+            $table->string('provider_id')->nullable();
+            $table->unique(['provider_name', 'provider_id']);
+
+            $table->string('phone_number', 20)->nullable()->unique();
+
+            $table->enum('role', ['user', 'admin'])->default('user');
+            $table->boolean('is_active')->default(true);
+
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
+
+        DB::statement('
+            ALTER TABLE users
+            ADD CONSTRAINT chk_password_or_provider
+            CHECK (
+                (password IS NOT NULL)
+                OR
+                (provider_name IS NOT NULL AND provider_id IS NOT NULL)
+            )
+        ');
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();

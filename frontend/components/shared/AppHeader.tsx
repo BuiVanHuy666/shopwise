@@ -2,18 +2,20 @@ import Image from "next/image";
 import { Category } from "@/types/category";
 import Link from "next/link";
 import { getCategoriesService } from "@/services/category";
+import { getCurrentUserAction, logoutAction } from "@/app/actions/auth";
 
 export const AppHeader = async () =>
 	{
-		const categories: Category[] = await getCategoriesService();
+		const categories: Category[] = await getCategoriesService().catch(() => []);
+		const user = await getCurrentUserAction();
+
 		return (
 				<header className="header_wrap fixed-top header_with_topbar">
 					<div className="bottom_header dark_skin main_menu_uppercase">
 						<div className="container">
 							<nav className="navbar navbar-expand-lg">
 								<Link className="navbar-brand" href="/">
-									<Image className="logo_dark" src="/assets/images/logo_dark.png" alt="logo" width={182} height={47}/>
-									<Image className="logo_light" src="/assets/images/logo_light.png" alt="logo" width={182} height={47}/>
+									<Image className="logo_dark" src="/assets/images/logo_dark.png" alt="logo" width={182} height={47} loading="eager"/>
 								</Link>
 								<button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-expanded="false">
 									<span className="ion-android-menu"></span>
@@ -68,7 +70,7 @@ export const AppHeader = async () =>
 																	</div>
 																	<div className="col-sm-4">
 																		<div className="header-banner">
-																			<Image src="/assets/images/menu_banner2.jpg" alt="menu_banner2" width={351} height={190}/>
+																			<Image src="/assets/images/menu_banner2.jpg" alt="menu_banner2" width={351} height={190} loading="eager"/>
 																			<div className="banne_info">
 																				<h6>15% Off</h6>
 																				<h4>{"Men's Fashion"}</h4>
@@ -132,7 +134,38 @@ export const AppHeader = async () =>
 												</p>
 											</div>
 										</div>
+
 									</li>
+
+									{user ? (
+											<li className="dropdown">
+												<a className="nav-link nav_item" href="#" data-bs-toggle="dropdown">
+													<i className="linearicons-user"></i>
+												</a>
+												<div className="dropdown-menu dropdown-menu-right" style={{ minWidth: '180px' }}>
+													<Link className="dropdown-item" href="/account">
+														Dashboard
+													</Link>
+
+													<div className="dropdown-divider"></div>
+													<form action={logoutAction} className="m-0">
+														<button
+																type="submit"
+																className="dropdown-item text-danger"
+																style={{ background: "transparent", border: "none", width: "100%", textAlign: "left", cursor: "pointer" }}
+														>
+															Đăng xuất
+														</button>
+													</form>
+												</div>
+											</li>
+									) : (
+											<li>
+												<Link href="/login" className="nav-link nav_item d-flex align-items-center">
+													<i className="linearicons-user" style={{ marginRight: '5px', fontSize: '18px' }}></i> Đăng Nhập
+												</Link>
+											</li>
+									)}
 								</ul>
 							</nav>
 						</div>

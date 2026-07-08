@@ -14,7 +14,7 @@ export const AppFooter = async () => {
 								<div className="widget">
 									<div className="footer_logo">
 										<a href="#">
-											<Image src="/assets/images/logo_light.png" alt="logo" width={182} height={47}/>
+											<Image src="/assets/images/logo_light.png" alt="logo" width={182} height={47} loading="eager"/>
 										</a>
 									</div>
 									<p>Cửa hàng thời trang cao cấp cung cấp các mẫu thiết kế mới nhất với chất lượng tốt nhất.</p>

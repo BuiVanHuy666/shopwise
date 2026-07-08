@@ -3,6 +3,15 @@
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ConstantController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\Auth\MeController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\ResendVerificationController;
+use App\Http\Controllers\Auth\SocialAuthController;
+use App\Http\Controllers\Auth\VerificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('categories')->group(function () {
@@ -16,3 +25,25 @@ Route::prefix('products')->group(function () {
 });
 
 Route::get('/options', ConstantController::class);
+
+Route::prefix('auth')->group(function () {
+    Route::post('/register', RegisterController::class)->middleware('throttle:login');
+    Route::post('/login', LoginController::class)->middleware('throttle:login');
+
+    Route::get('/{provider}/redirect', [SocialAuthController::class, 'redirect']);
+    Route::get('/{provider}/callback', [SocialAuthController::class, 'callback']);
+
+    Route::post('/forgot-password', ForgotPasswordController::class)->middleware('throttle:auth-spam');
+
+    Route::post('/reset-password', ResetPasswordController::class);
+
+    Route::middleware('auth:api')->group(function () {
+        Route::get('/me', MeController::class);
+        Route::post('/logout', LogoutController::class);
+        Route::post('/email/resend', ResendVerificationController::class)->middleware('throttle:auth-spam');
+    });
+});
+
+Route::get('/email/verify/{id}/{hash}', VerificationController::class)
+     ->middleware(['signed'])
+     ->name('verification.verify');

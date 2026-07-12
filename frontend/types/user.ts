@@ -1,5 +1,5 @@
 export interface User {
-	id: number;
+	id?: number | string;
 	email: string;
 	name: string;
 	is_verified: boolean;

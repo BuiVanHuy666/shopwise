@@ -1,22 +1,30 @@
 import 'server-only';
 import { Constants } from "@/types/constant";
+import { LocationResponse } from "@/types/api";
+import { api } from "@/libs/api";
+import { handleActionError } from "@/utils/helper";
 
-export const getConstantsService = async (
-		includes: ('colors' | 'sizes')[] = ['colors', 'sizes']
-): Promise<Constants> =>
-	{
+export const getConstantsService = async (includes: ('colors' | 'sizes')[] = ['colors', 'sizes']): Promise<Constants> => {
+	const queryString = includes.join(',');
 
-		const queryString = includes.join(',');
+	const res = await api.get<{
+		data: Constants
+	}>(`/options?include=${queryString}`, {
+		next: {revalidate: 86400}
+	})
 
-		const res = await fetch(`${process.env.BACKEND_API_URL}/options?include=${queryString}`, {
-			next: {revalidate: 86400}
-		});
+	return res.data;
+};
 
-		if (!res.ok) {
-			throw new Error('Lấy dữ liệu Constants thất bại');
-		}
+export const getLocations = (provinceCodes?: string): Promise<LocationResponse> => {
+	try {
+		const endpoint = provinceCodes
+				? `/locations?province_code=${provinceCodes}`
+				: '/locations';
 
-		const result = await res.json();
-
-		return result.data;
-	};
+		return api.get<LocationResponse>(endpoint);
+	} catch (error) {
+		handleActionError(error);
+		throw error;
+	}
+}

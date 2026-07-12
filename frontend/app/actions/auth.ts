@@ -1,27 +1,20 @@
 'use server'
 
 import { cookies } from "next/headers";
-import { RegisterSchema } from "@/validations/register.schema";
-import { LoginSchema } from "@/validations/login.schema";
+import { RegisterSchema } from "@/validations/auth/register.schema";
+import { LoginSchema } from "@/validations/auth/login.schema";
 import { redirect } from "next/navigation";
-import {ForgotPasswordSchema} from "@/validations/forgotPassword.schema";
+import {ForgotPasswordSchema} from "@/validations/auth/forgotPassword.schema";
 import { api, ApiError } from "@/libs/api";
-import { ForgotPasswordResponse, LoginResponse, RegisterResponse } from "@/types/api";
+import { ActionState, ForgotPasswordResponse, LoginResponse, RegisterResponse } from "@/types/api";
 import { handleActionError } from "@/utils/helper";
 import { validateForm } from "@/utils/validate";
-import { ResetPasswordSchema } from "@/validations/resetPassword.schema";
+import { ResetPasswordSchema } from "@/validations/auth/resetPassword.schema";
 
 export interface User {
 	email: string;
 	name: string;
 	is_verified: boolean;
-}
-
-export interface ActionState {
-	status: "idle" | "success" | "error";
-	message: string;
-	errors?: Record<string, string[]> | null;
-	oldValues?: Record<string, unknown>;
 }
 
 export const registerAction = async (_prev: ActionState | null, formData: FormData): Promise<ActionState> => {
@@ -101,7 +94,9 @@ export const getCurrentUserAction = async (): Promise<User | null> => {
 	}
 
 	try {
-		return await api.get<User>("/auth/me", { cache: "no-store"});
+		const response = await api.get<{user: User}>("/auth/me", { cache: "no-store" });
+
+		return response.user;
 	} catch (error) {
 		const apiError = error as ApiError;
 		if (apiError.status !== 401) {

@@ -5,6 +5,8 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Database\QueryException;
+use Illuminate\Database\Eloquent\MassAssignmentException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -28,4 +30,14 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 404);
             }
         });
+        $exceptions->render(function (\Throwable $e, $request) {
+                if ($request->is('api/*')) {
+                    if ($e instanceof QueryException || $e instanceof MassAssignmentException) {
+                        return response()->json([
+                            'message' => 'Oops, đã có lỗi hệ thống xảy ra từ máy chủ.',
+                            'errors' => null
+                        ], 500);
+                    }
+                }
+            });
     })->create();

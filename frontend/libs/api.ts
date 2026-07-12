@@ -44,9 +44,19 @@ async function fetchApi<T>(endpoint: string, options: RequestInit): Promise<T> {
 	if (!response.ok) {
 		const errorData = await response.json().catch(() => ({}));
 
+		const isServerError = response.status >= 500;
+
+		let safeMessage = "Đã xảy ra lỗi từ hệ thống.";
+
+		if (isServerError) {
+			safeMessage = "Oops, đã có lỗi xảy ra ở máy chủ. Vui lòng thử lại sau!";
+		} else if (errorData.message) {
+			safeMessage = errorData.message;
+		}
+
 		throw {
 			status: response.status,
-			message: errorData.message || "Đã xảy ra lỗi từ hệ thống.",
+			message: safeMessage,
 			errors: errorData.errors || null
 		};
 	}
@@ -64,7 +74,7 @@ export const api = {
 		method: "POST",
 		body: JSON.stringify(body)
 	}),
-	put: <T>(endpoint: string, body: Record<string, unknown>, options?: RequestInit) => <T>fetchApi(endpoint, {
+	put: <T>(endpoint: string, body: Record<string, unknown>, options?: RequestInit) => fetchApi<T>(endpoint, {
 		...options,
 		method: "PUT",
 		body: JSON.stringify(body)

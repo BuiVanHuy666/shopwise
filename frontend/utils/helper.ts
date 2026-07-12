@@ -1,6 +1,6 @@
 import { UploadType } from "@/types/product";
-import { ActionState } from "@/app/actions/auth";
 import { ApiError } from "@/libs/api";
+import { ActionState } from "@/types/api";
 
 export const getHiddenImageUrl = (filename: string, type: UploadType = 'colors') =>
 		`/uploads/${type}/${filename}`;
@@ -26,3 +26,5 @@ export const handleActionError = (error: unknown, oldValues?: Record<string, unk
 		oldValues
 	};
 };
+
+export const fetcher = (url: string) => fetch(url).then(res => res.json());

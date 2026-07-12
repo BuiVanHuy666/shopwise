@@ -59,6 +59,18 @@ export const EditProfileModal = ({
 	}, [maxDays, dob.day]);
 
 	useEffect(() => {
+		if (state?.oldValues && state.status === "error") {
+			if (state.oldValues.day || state.oldValues.month || state.oldValues.year) {
+				setDob({
+					day: state.oldValues.day as string || '',
+					month: state.oldValues.month as string || '',
+					year: state.oldValues.year as string || ''
+				});
+			}
+		}
+	}, [state]);
+
+	useEffect(() => {
 		if (state?.status === "success") {
 			toast.success(state.message);
 			onSuccess();

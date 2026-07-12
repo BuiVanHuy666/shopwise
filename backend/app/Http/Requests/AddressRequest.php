@@ -16,7 +16,13 @@ class AddressRequest extends FormRequest
     {
         return [
             'receiver_name' => ['required', 'string', 'max:255'],
-            'receiver_phone_number' => ['required', 'string', 'max:20'],
+            'receiver_phone_number' => [
+                'nullable',
+                'string',
+                'max:20',
+                'regex:/^[0-9\+\-\(\)\s]+$/',
+                Rule::unique('users', 'phone_number')->ignore($userId)
+            ],
             'province_code' => ['required', 'integer'],
             'ward_code' => [
                 'required',

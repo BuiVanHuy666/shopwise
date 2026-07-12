@@ -18,7 +18,13 @@ class UpdateProfileRequest extends FormRequest
 
         return [
             'name' => ['required', 'string', 'max:255'],
-            'phone_number' => ['nullable', 'string', 'max:20', Rule::unique('users', 'phone_number')->ignore($userId)],
+            'phone_number' => [
+                'nullable',
+                'string',
+                'max:20',
+                'regex:/^[0-9\+\-\(\)\s]+$/',
+                Rule::unique('users', 'phone_number')->ignore($userId)
+            ],
             'gender' => ['nullable', 'integer', 'in:0,1,2'],
             'date_of_birth' => ['nullable', 'date'],
             'height' => ['nullable', 'integer', 'min:100', 'max:250'],
@@ -30,6 +36,7 @@ class UpdateProfileRequest extends FormRequest
     {
         return [
             'phone_number.unique' => 'Số điện thoại này đã được tài khoản khác sử dụng.',
+            'phone_number.regex' => 'Số điện thoại chứa ký tự không hợp lệ.',
         ];
     }
 }

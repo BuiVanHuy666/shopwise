@@ -46,6 +46,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
 							objectFit: "cover",
 							objectPosition: "center",
 						}}
+						loading="eager"
 					/>
 				</a>
 				<div className="product_action_box">

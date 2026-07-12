@@ -1,9 +1,8 @@
 import 'server-only';
 import { ProductDetail } from "@/types/product";
+import { api } from "@/libs/api";
 
-const BACKEND_API_URL = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL;
-
-export const getProductsByCategorySlugService = async (slug: string, searchParams?: { [key: string]: string | string[] | undefined }) => {
+const indexByCategory = async (slug: string, searchParams?: { [key: string]: string | string[] | undefined }) => {
 	const query = new URLSearchParams();
 	if (searchParams) {
 		Object.entries(searchParams).forEach(([key, value]) => {
@@ -28,15 +27,17 @@ export const getProductsByCategorySlugService = async (slug: string, searchParam
 	return res.json();
 }
 
-export async function getProductDetailService(slug: string): Promise<ProductDetail | null> {
-	const res = await fetch(`${BACKEND_API_URL}/products/${slug}`, {
+async function show(slug: string): Promise<ProductDetail | null> {
+	const response = await api.get<{ data: ProductDetail }>(`/products/${slug}`, {
 		next: { revalidate: 60 }
 	});
 
-	if (!res.ok) {
-		return null;
-	}
-
-	const result = await res.json();
-	return result.data;
+	return response.data as ProductDetail;
 }
+
+const productService = {
+	show,
+	indexByCategory
+}
+
+export default productService;

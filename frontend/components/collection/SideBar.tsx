@@ -61,7 +61,7 @@ export default function Sidebar({ category, constants }: {
 											<li key={child.id}>
 												<a href={child.slug}>
 													<span className="categories_name">{child.name}</span>
-													<span className="categories_num">(9)</span>
+													<span className="categories_num">({child.products_count})</span>
 												</a>
 											</li>
 									))}

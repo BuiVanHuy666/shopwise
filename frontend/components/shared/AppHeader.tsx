@@ -1,12 +1,11 @@
 import Image from "next/image";
-import { Category } from "@/types/category";
 import Link from "next/link";
-import { getCategoriesService } from "@/services/category";
 import { getCurrentUserAction, logoutAction } from "@/app/actions/auth";
+import categoryService from "@/services/category";
 
 export const AppHeader = async () =>
 	{
-		const categories: Category[] = await getCategoriesService().catch(() => []);
+		const categories = await categoryService.index();
 		const user = await getCurrentUserAction();
 
 		return (

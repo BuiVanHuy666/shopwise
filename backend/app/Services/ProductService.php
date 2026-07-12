@@ -7,6 +7,7 @@ use App\Http\Resources\Product\ProductCardResource;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
 class ProductService
@@ -48,6 +49,28 @@ class ProductService
 
         if (!empty($minPrice) || !empty($maxPrice)) {
             $query->priceRange($minPrice, $maxPrice);
+        }
+
+        $allCategories = new Collection([$category]);
+
+        $flattenCategories = function ($categories) use (&$flattenCategories, $allCategories) {
+            foreach ($categories as $cat) {
+                $allCategories->push($cat);
+
+                if ($cat->relationLoaded('children')) {
+                    $flattenCategories($cat->children);
+                }
+            }
+        };
+
+        if ($category->relationLoaded('children')) {
+            $flattenCategories($category->children);
+        }
+
+        foreach ($allCategories as $cat) {
+            $cat->loadCount(['products' => function ($q) {
+                $q->active();
+            }]);
         }
 
         $paginator = $query

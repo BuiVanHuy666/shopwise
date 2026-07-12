@@ -14,6 +14,7 @@ use App\Http\Controllers\Auth\ResendVerificationController;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Api\LocationController;
+use App\Http\Controllers\Profile\UpdateProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('categories')->group(function () {
@@ -46,6 +47,7 @@ Route::prefix('auth')->group(function () {
         Route::post('/email/resend', ResendVerificationController::class)->middleware('throttle:auth-spam');
 
         Route::apiResource('addresses', UserAddressController::class);
+        Route::put('/profile', UpdateProfileController::class);
     });
 });
 

@@ -22,7 +22,11 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
     'phone_number',
     'avatar',
     'email_verified_at',
-    'is_default'
+    'is_default',
+    'gender',
+    'date_of_birth',
+    'height',
+    'weight',
 ])]
 #[Hidden(['password', 'remember_token', 'provider_id', 'provider_name'])]
 class User extends Authenticatable implements JWTSubject, MustVerifyEmail
@@ -40,6 +44,8 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'created_at' => 'datetime',
+            'date_of_birth' => 'date:Y-m-d'
         ];
     }
 

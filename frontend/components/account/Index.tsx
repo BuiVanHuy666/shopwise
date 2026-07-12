@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Dashboard from "@/components/account/Dashboard";
 import Orders from "@/components/account/Orders";
-import Address from "@/components/account/Address/Address";
+import Address from "@/components/account/Address";
 import AccountDetail from "@/components/account/AccountDetail";
 import { User } from "@/types/user";
 
@@ -44,7 +44,7 @@ export function Index({ initialUser }: AccountClientProps) {
 			case "address":
 				return <Address />;
 			case "account":
-				return <AccountDetail />;
+				return <AccountDetail user={initialUser} />;
 			default:
 				return null;
 		}

@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { Address } from "@/types/address";
-import { AddressCard } from "@/components/account/Address/AddressCard";
-import { AddressModal } from "@/components/account/Address/AddressModal";
+import { AddressCard } from "@/components/account/address/AddressCard";
+import { AddressModal } from "@/components/account/address/AddressModal";
 import { toast } from "react-toastify";
 import { destroyAction } from "@/app/actions/address";
 import { toastConfirm } from "@/components/shared/utils/ToastConfirm";
@@ -51,7 +51,7 @@ export default function AddressList() {
 	};
 
 	return (
-			<div>
+			<>
 				<div className="d-flex justify-content-between align-items-center mb-4">
 					<h4>Danh sách địa chỉ</h4>
 					<button className="btn btn-fill-out btn-sm" onClick={handleOpenCreateModal}>
@@ -81,11 +81,9 @@ export default function AddressList() {
 						<AddressModal
 								address={editingAddress}
 								onClose={() => setIsModalOpen(false)}
-								onSuccess={() => {
-									setIsModalOpen(false);
-								}}
+								onSuccess={() => {setIsModalOpen(false);}}
 						/>
 				)}
-			</div>
+			</>
 	);
 }

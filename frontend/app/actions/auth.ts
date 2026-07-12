@@ -10,12 +10,7 @@ import { ActionState, ForgotPasswordResponse, LoginResponse, RegisterResponse } 
 import { handleActionError } from "@/utils/helper";
 import { validateForm } from "@/utils/validate";
 import { ResetPasswordSchema } from "@/validations/auth/resetPassword.schema";
-
-export interface User {
-	email: string;
-	name: string;
-	is_verified: boolean;
-}
+import { User, UserDetail } from "@/types/user";
 
 export const registerAction = async (_prev: ActionState | null, formData: FormData): Promise<ActionState> => {
 	const rawFormData = {
@@ -86,7 +81,7 @@ export const logoutAction = async () => {
 	redirect("/login");
 };
 
-export const getCurrentUserAction = async (): Promise<User | null> => {
+export async function getCurrentUserAction(includeDetail: boolean = false): Promise<User | UserDetail | null> {
 	const token = (await cookies()).get("access_token")?.value;
 
 	if (!token) {
@@ -94,7 +89,9 @@ export const getCurrentUserAction = async (): Promise<User | null> => {
 	}
 
 	try {
-		const response = await api.get<{user: User}>("/auth/me", { cache: "no-store" });
+		const endpoint = includeDetail ? "/auth/me?include=detail" : "/auth/me";
+
+		const response = await api.get<{user: UserDetail}>(endpoint, { cache: "no-store" });
 
 		return response.user;
 	} catch (error) {
@@ -104,7 +101,7 @@ export const getCurrentUserAction = async (): Promise<User | null> => {
 		}
 		return null;
 	}
-};
+}
 
 export const forgotPasswordAction = async (_prev: ActionState | null, formData: FormData): Promise<ActionState> => {
 	const rawFormData = {

@@ -27,4 +27,15 @@ export const handleActionError = (error: unknown, oldValues?: Record<string, unk
 	};
 };
 
+export const getUserGender = (gender: number | null): string => {
+	const genderMap: Record<number, string> = {
+		0: "Nữ",
+		1: "Nam",
+		2: "Khác"
+	};
+
+	return gender !== null && gender !== undefined && genderMap[gender]
+			? genderMap[gender]
+			: "Chưa cập nhật";
+};
 export const fetcher = (url: string) => fetch(url).then(res => res.json());

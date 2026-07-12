@@ -22,6 +22,10 @@ return new class extends Migration
             $table->unique(['provider_name', 'provider_id']);
 
             $table->string('phone_number', 20)->nullable()->unique();
+            $table->unsignedTinyInteger('gender')->nullable()->comment('0: Male, 1: Female, 2: Other, null if not specified');
+            $table->date('date_of_birth')->nullable();
+            $table->unsignedSmallInteger('height')->nullable()->comment('Height in centimeters');
+            $table->unsignedSmallInteger('weight')->nullable()->comment('Weight in kilograms');
 
             $table->enum('role', ['user', 'admin'])->default('user');
             $table->boolean('is_active')->default(true);

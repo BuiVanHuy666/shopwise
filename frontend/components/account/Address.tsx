@@ -1,65 +1,95 @@
-export default function Address() {
+'use client';
+
+import { useState } from 'react';
+import { Address } from "@/types/address";
+import { AddressCard } from "@/components/account/address/AddressCard";
+import { AddressModal } from "@/components/account/address/AddressModal";
+import { toast } from "react-toastify";
+import { destroyAction } from "@/app/actions/address";
+import { toastConfirm } from "@/components/shared/utils/ToastConfirm";
+import useSWR from "swr";
+import { fetcher } from "@/utils/helper";
+
+export default function AddressList() {
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [editingAddress, setEditingAddress] = useState<Address | null>(null);
+	const {
+		data: addresses,
+		isLoading,
+		mutate
+	} = useSWR<Address[]>('/api/addresses', fetcher);
+
+	if (isLoading) return <div>Đang tải dữ liệu...</div>;
+
+	const handleOpenCreateModal = () => {
+		if (addresses && addresses.length >= 10) {
+			toast.error("Bạn chỉ được tạo tối đa 10 địa chỉ giao hàng.");
+			return;
+		}
+		setEditingAddress(null);
+		setIsModalOpen(true);
+	};
+
+	const handleOpenEditModal = (address: Address) => {
+		setEditingAddress(address);
+		setIsModalOpen(true);
+	};
+
+	const handleDelete = async (id: number | string) => {
+		const isConfirmed = await toastConfirm("Bạn có chắc chắn muốn xóa địa chỉ này không?");
+
+		if (isConfirmed) {
+			try {
+				const res = await destroyAction(id);
+				if (res?.status === "success") {
+					toast.success(res.message);
+					await mutate();
+				} else {
+					toast.error(res?.message || "Xóa thất bại!");
+				}
+			} catch {
+				toast.error("Đã xảy ra lỗi khi xóa.");
+			}
+		}
+	};
+
 	return (
-			<div className="row">
-				<div className="col-lg-6">
-					<div className="card mb-3">
-						<div className="card-header">
-							<h3>Địa chỉ thanh toán</h3>
-						</div>
-
-						<div className="card-body">
-							<address>
-								Số 15
-								<br />
-								Đường số 1
-								<br />
-								Khu C
-								<br />
-								Phường ABC
-								<br />
-								Quận XYZ
-								<br />
-								TP. Hồ Chí Minh
-							</address>
-
-							<p>Việt Nam</p>
-
-							<button className="btn btn-fill-out">
-								Chỉnh sửa
-							</button>
-						</div>
-					</div>
+			<>
+				<div className="d-flex justify-content-between align-items-center mb-4">
+					<h4>Danh sách địa chỉ</h4>
+					<button className="btn btn-fill-out btn-sm" onClick={handleOpenCreateModal}>
+						+ Thêm địa chỉ mới
+					</button>
 				</div>
 
-				<div className="col-lg-6">
-					<div className="card">
-						<div className="card-header">
-							<h3>Địa chỉ giao hàng</h3>
+				{(!addresses || addresses.length === 0) && !isLoading ? (
+						<div className="alert alert-warning">
+							Bạn chưa có địa chỉ giao hàng nào. Vui lòng thêm mới!
 						</div>
-
-						<div className="card-body">
-							<address>
-								Số 15
-								<br />
-								Đường số 1
-								<br />
-								Khu C
-								<br />
-								Phường ABC
-								<br />
-								Quận XYZ
-								<br />
-								TP. Hồ Chí Minh
-							</address>
-
-							<p>Việt Nam</p>
-
-							<button className="btn btn-fill-out">
-								Chỉnh sửa
-							</button>
+				) : (
+						<div className="row">
+							{addresses && addresses.map((addressItem) => (
+									<div className="col-lg-6" key={addressItem.id}>
+										<AddressCard
+												address={addressItem}
+												onEdit={handleOpenEditModal}
+												onDelete={handleDelete}
+										/>
+									</div>
+							))}
 						</div>
-					</div>
-				</div>
-			</div>
+				)}
+
+				{isModalOpen && (
+						<AddressModal
+								address={editingAddress}
+								onClose={() => setIsModalOpen(false)}
+								onSuccess={async () => {
+									setIsModalOpen(false);
+									await mutate();
+								}}
+						/>
+				)}
+			</>
 	);
 }

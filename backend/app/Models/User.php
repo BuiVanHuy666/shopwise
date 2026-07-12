@@ -7,12 +7,27 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-#[Fillable(['name', 'email', 'password', 'provider_name', 'provider_id', 'phone_number', 'avatar', 'email_verified_at'])]
+#[Fillable([
+    'name',
+    'email',
+    'password',
+    'provider_name',
+    'provider_id',
+    'phone_number',
+    'avatar',
+    'email_verified_at',
+    'is_default',
+    'gender',
+    'date_of_birth',
+    'height',
+    'weight',
+])]
 #[Hidden(['password', 'remember_token', 'provider_id', 'provider_name'])]
 class User extends Authenticatable implements JWTSubject, MustVerifyEmail
 {
@@ -29,6 +44,8 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'created_at' => 'datetime',
+            'date_of_birth' => 'date:Y-m-d'
         ];
     }
 
@@ -40,5 +57,10 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     public function getJWTCustomClaims(): array
     {
         return [];
+    }
+
+    public function addresses(): HasMany
+    {
+        return $this->hasMany(UserAddress::class);
     }
 }

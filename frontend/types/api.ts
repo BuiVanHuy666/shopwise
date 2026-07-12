@@ -1,4 +1,5 @@
 import { User } from "@/types/user";
+import { Location } from "@/types/location";
 
 export interface PaginationResponse<T> {
 	data: T,
@@ -39,4 +40,16 @@ export interface RegisterResponse {
 export interface ForgotPasswordResponse {
 	message: string
 	errors?: Record<string, string>[]
+}
+
+export interface LocationResponse {
+	message: string,
+	data: Location[]
+}
+
+export interface ActionState {
+	status: "idle" | "success" | "error";
+	message: string;
+	errors?: Record<string, string[]> | null;
+	oldValues?: Record<string, unknown> | null;
 }

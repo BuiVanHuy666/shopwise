@@ -13,10 +13,13 @@ import { fetcher } from "@/utils/helper";
 export default function AddressList() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [editingAddress, setEditingAddress] = useState<Address | null>(null);
-	const { data: addresses, isLoading, mutate } = useSWR<Address[]>('/api/addresses', fetcher);
+	const {
+		data: addresses,
+		isLoading,
+		mutate
+	} = useSWR<Address[]>('/api/addresses', fetcher);
 
 	if (isLoading) return <div>Đang tải dữ liệu...</div>;
-
 
 	const handleOpenCreateModal = () => {
 		if (addresses && addresses.length >= 10) {
@@ -81,7 +84,10 @@ export default function AddressList() {
 						<AddressModal
 								address={editingAddress}
 								onClose={() => setIsModalOpen(false)}
-								onSuccess={() => {setIsModalOpen(false);}}
+								onSuccess={async () => {
+									setIsModalOpen(false);
+									await mutate();
+								}}
 						/>
 				)}
 			</>

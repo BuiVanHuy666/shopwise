@@ -93,7 +93,7 @@ export const AddressModal = ({ address, onClose, onSuccess }: AddressModalProps)
 												name="province_code"
 												disabled={isProvincesLoading || isPending}
 												defaultValue={state?.oldValues?.province_code as string ?? address?.province?.code ?? ""}
-												onChange={(e) => setSelectedProvince(e.target.value)}
+												onChange={(e) => {setSelectedProvince(e.target.value);}}
 										>
 											<option value="">{isProvincesLoading ? 'Đang tải dữ liệu...' : 'Chọn Tỉnh/Thành phố'}</option>
 											{provinces?.map(p => (

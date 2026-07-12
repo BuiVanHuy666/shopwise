@@ -5,7 +5,7 @@ import { CreateAddressInput } from "@/validations/address/create.schema";
 
 export const get = async (): Promise<Address[]> => {
 	try {
-		const response = await api.get<{data: Address[]}>('/auth/addresses');
+		const response = await api.get<{ data: Address[] }>('/auth/addresses');
 		return response.data;
 	} catch (error) {
 		throw error;
@@ -13,27 +13,15 @@ export const get = async (): Promise<Address[]> => {
 }
 
 const destroy = async (id: number | string): Promise<void> => {
-	try {
-		await api.delete(`/auth/addresses/${id}`);
-	} catch (error) {
-		throw error;
-	}
+	await api.delete(`/auth/addresses/${id}`);
 }
 
 const update = async (id: number | string, data: CreateAddressInput): Promise<void> => {
-	try {
-		await api.put(`/auth/addresses/${id}`, data);
-	} catch (error) {
-		throw error;
-	}
+	await api.put(`/auth/addresses/${id}`, data);
 }
 
 const create = async (data: CreateAddressInput): Promise<void> => {
-	try {
-		await api.post('/auth/addresses', data);
-	} catch (error) {
-		throw error;
-	}
+	await api.post('/auth/addresses', data);
 }
 
 const addressService = {

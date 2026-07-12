@@ -1,19 +1,24 @@
 'use server'
 
 import { cookies } from "next/headers";
-import { RegisterSchema } from "@/validations/auth/register.schema";
-import { LoginSchema } from "@/validations/auth/login.schema";
 import { redirect } from "next/navigation";
-import {ForgotPasswordSchema} from "@/validations/auth/forgotPassword.schema";
-import { api, ApiError } from "@/libs/api";
-import { ActionState, ForgotPasswordResponse, LoginResponse, RegisterResponse } from "@/types/api";
+import { ApiError } from "@/libs/api";
+import { ActionState } from "@/types/api";
 import { handleActionError } from "@/utils/helper";
-import { validateForm } from "@/utils/validate";
-import { ResetPasswordSchema } from "@/validations/auth/resetPassword.schema";
 import { User, UserDetail } from "@/types/user";
+import authService from "@/services/auth";
+
+export const storeAccessToken = async (token: string, remember: boolean = false) => {
+	(await cookies()).set("access_token", token, {
+		httpOnly: true,
+		secure: process.env.NODE_ENV === "production",
+		path: "/",
+		maxAge: remember ? 60 * 60 * 24 * 14 : 60 * 60 * 24,
+	});
+};
 
 export const registerAction = async (_prev: ActionState | null, formData: FormData): Promise<ActionState> => {
-	const rawFormData = {
+	const rawData = {
 		name: formData.get("name") as string,
 		email: formData.get("email") as string,
 		password: formData.get("password") as string,
@@ -21,11 +26,10 @@ export const registerAction = async (_prev: ActionState | null, formData: FormDa
 		accepted: formData.get("accepted"),
 	};
 
-	const oldValues = { name: rawFormData.name, email: rawFormData.email, accepted: rawFormData.accepted !== null };
+	const oldValues = { name: rawData.name, email: rawData.email, accepted: rawData.accepted !== null };
 
 	try {
-		const validatedData = validateForm(RegisterSchema, rawFormData);
-		const response = await api.post<RegisterResponse>("/auth/register", validatedData);
+		const response = await authService.register(rawData);
 
 		if (response.access_token) {
 			await storeAccessToken(response.access_token);
@@ -35,27 +39,25 @@ export const registerAction = async (_prev: ActionState | null, formData: FormDa
 			status: "success",
 			message: response.message || "Đăng ký tài khoản thành công!",
 		};
-
 	} catch (error) {
 		return handleActionError(error, oldValues);
 	}
 }
 
 export const loginAction = async (_prev: ActionState | null, formData: FormData): Promise<ActionState> => {
-	const rawFormData = {
+	const rawData = {
 		email: formData.get("email") as string,
 		password: formData.get("password") as string,
 		remember: formData.get("remember") === "yes",
 	};
 
-	const oldValues = { email: rawFormData.email, accepted: false };
+	const oldValues = { email: rawData.email, accepted: false };
 
 	try {
-		const validatedFields = validateForm(LoginSchema, rawFormData);
-		const response = await api.post<LoginResponse>("/auth/login", validatedFields);
+		const response = await authService.login(rawData);
 
 		if (response.access_token) {
-			await storeAccessToken(response.access_token, rawFormData.remember);
+			await storeAccessToken(response.access_token, rawData.remember);
 		}
 
 		return { status: "success", message: response.message || "Đăng nhập thành công!" };
@@ -70,7 +72,7 @@ export const logoutAction = async () => {
 
 	if (token) {
 		try {
-			await api.post("/auth/logout");
+			await authService.logout();
 		} catch (error) {
 			console.error("Lỗi khi gọi API logout backend:", error);
 		}
@@ -89,11 +91,7 @@ export async function getCurrentUserAction(includeDetail: boolean = false): Prom
 	}
 
 	try {
-		const endpoint = includeDetail ? "/auth/me?include=detail" : "/auth/me";
-
-		const response = await api.get<{user: UserDetail}>(endpoint, { cache: "no-store" });
-
-		return response.user;
+		return await authService.getCurrentUser(includeDetail);
 	} catch (error) {
 		const apiError = error as ApiError;
 		if (apiError.status !== 401) {
@@ -104,14 +102,13 @@ export async function getCurrentUserAction(includeDetail: boolean = false): Prom
 }
 
 export const forgotPasswordAction = async (_prev: ActionState | null, formData: FormData): Promise<ActionState> => {
-	const rawFormData = {
+	const rawData = {
 		email: formData.get("email") as string,
 	};
-	const oldValues = { name: "", email: rawFormData.email, accepted: false };
+	const oldValues = { name: "", email: rawData.email, accepted: false };
 
 	try {
-		const validatedData = validateForm(ForgotPasswordSchema, rawFormData);
-		const response = await api.post<ForgotPasswordResponse>('/auth/forgot-password', validatedData);
+		const response = await authService.forgotPassword(rawData);
 
 		return {
 			status: "success",
@@ -134,27 +131,23 @@ export const resendVerificationAction = async (): Promise<ActionState> => {
 	}
 
 	try {
-		const response = await api.post<{message: string}>("/auth/email/resend");
+		const response = await authService.resendVerification();
 
 		return {
 			status: "success",
 			message: response.message || "Đã gửi lại email thành công!",
 		};
-
 	} catch (error) {
 		return handleActionError(error);
 	}
 };
 
 export const resetPasswordAction = async (_prev: ActionState | null, formData: FormData): Promise<ActionState> => {
-	const rawFormData = Object.fromEntries(formData);
-
-	const oldValues = { email: rawFormData.email as string };
+	const rawData = Object.fromEntries(formData);
+	const oldValues = { email: rawData.email as string };
 
 	try {
-		const validatedData = validateForm(ResetPasswordSchema, rawFormData);
-
-		const response = await api.post<{message: string}>('/auth/reset-password', validatedData);
+		const response = await authService.resetPassword(rawData);
 
 		return {
 			status: "success",
@@ -164,12 +157,3 @@ export const resetPasswordAction = async (_prev: ActionState | null, formData: F
 		return handleActionError(error, oldValues);
 	}
 }
-
-export const storeAccessToken = async (token: string, remember: boolean = false) => {
-	(await cookies()).set("access_token", token, {
-		httpOnly: true,
-		secure: process.env.NODE_ENV === "production",
-		path: "/",
-		maxAge: remember ? 60 * 60 * 24 * 14 : 60 * 60 * 24,
-	});
-};

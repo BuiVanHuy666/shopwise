@@ -18,6 +18,11 @@ export async function proxy(request: NextRequest) {
 	if (!token || (token && isTokenExpired(token))) {
 		const response = NextResponse.next()
 		response.cookies.delete('access_token')
+
+		if (isProtectedRoute) {
+			return NextResponse.redirect(new URL('/login', request.url));
+		}
+		
 		return response
 	}
 
@@ -26,9 +31,31 @@ export async function proxy(request: NextRequest) {
 	// TRƯỜNG HỢP 2: ĐÃ ĐĂNG NHẬP
 	// ==========================================
 
-	// 2.1. Đã đăng nhập mà cố vào lại form Đăng nhập/Đăng ký -> Hất về trang chủ
+	// 2.1. Đã đăng nhập mà cố vào lại form Đăng nhập/Đăng ký -> Kiểm tra token hợp lệ trước
 	if (isAuthRoute) {
-		return NextResponse.redirect(new URL('/', request.url));
+		// Verify token with backend trước khi redirect về home
+		try {
+			const res = await fetch(`${process.env.BACKEND_API_URL}/auth/me`, {
+				headers: {
+					'Authorization': `Bearer ${token}`,
+					'Accept': 'application/json',
+				},
+			});
+
+			// Nếu token sai hoặc hết hạn -> Xóa cookie và cho qua để vào login
+			if (!res.ok) {
+				const response = NextResponse.next();
+				response.cookies.delete('access_token');
+				return response;
+			}
+
+			// Token hợp lệ -> Redirect về trang chủ
+			return NextResponse.redirect(new URL('/', request.url));
+		} catch (error) {
+			console.error("Lỗi Proxy Auth Route:", error);
+			// Nếu có lỗi, cho qua để safe
+			return NextResponse.next();
+		}
 	}
 
 	// 2.2. Kiểm tra xác thực Email (Chỉ chạy khi vào trang bảo mật để tránh lag server)

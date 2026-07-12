@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
 import ProductList from "@/components/collection/ProductList";
-import { getProductsByCategorySlugService } from "@/services/product";
 import { getConstantsService } from "@/services/constant";
 import Sidebar from "@/components/collection/SideBar";
 import { Newsletter } from "@/components/shared/Newsletter";
+import productService from "@/services/product";
 
 export default async function CollectionPage({params, searchParams}: {params: Promise<{slug: string}>, searchParams: Promise<{ [key: string]: string | string[] | undefined }>}) {
 	const {slug} = await params;
@@ -14,7 +14,7 @@ export default async function CollectionPage({params, searchParams}: {params: Pr
 
 	try {
 		[productsResponse, constantsData] = await Promise.all([
-			getProductsByCategorySlugService(slug, currentSearchParams),
+			productService.indexByCategory(slug, currentSearchParams),
 			getConstantsService()
 		]);
 	} catch (error) {
@@ -24,7 +24,6 @@ export default async function CollectionPage({params, searchParams}: {params: Pr
 
 	const { data, category, meta } = productsResponse;
 
-	const currentPage = meta.current_page || 1;
 	const lastPage = meta.last_page || 1;
 	const totalProducts = meta.total || 0;
 
@@ -60,7 +59,6 @@ export default async function CollectionPage({params, searchParams}: {params: Pr
 									<ProductList
 											initialProducts={data ?? []}
 											categorySlug={slug}
-											initialCurrentPage={currentPage}
 											lastPage={lastPage}
 											totalProducts={totalProducts}
 											currentSearchParams={currentSearchParams}

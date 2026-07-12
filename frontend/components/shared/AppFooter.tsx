@@ -1,9 +1,8 @@
 import Image from "next/image";
-import { Category } from "@/types/category";
-import { getCategoriesService } from "@/services/category";
+import categoryService from "@/services/category";
 
 export const AppFooter = async () => {
-	const categories: Category[] = await getCategoriesService();
+	const categories = await categoryService.index();
 
 	return (
 			<footer className="footer_dark">

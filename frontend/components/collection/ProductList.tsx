@@ -1,13 +1,13 @@
 'use client';
-import { useEffect, useState } from 'react';
+
+import useSWRInfinite from 'swr/infinite';
 import { ProductCard } from "@/components/shared/ProductCard";
 import { Product } from "@/types/product";
-import { loadMoreProductsAction } from "@/app/actions/product";
+import { fetcher } from "@/utils/helper";
 
 interface ProductListProps {
 	initialProducts: Product[];
 	categorySlug: string;
-	initialCurrentPage: number;
 	lastPage: number;
 	totalProducts: number;
 	currentSearchParams: { [key: string]: string | string[] | undefined };
@@ -16,46 +16,43 @@ interface ProductListProps {
 export default function ProductList({
 	initialProducts,
 	categorySlug,
-	initialCurrentPage,
 	lastPage,
 	totalProducts,
 	currentSearchParams
 }: ProductListProps) {
+	const getKey = (pageIndex: number, previousPageData: any) => {
+		if (previousPageData && !previousPageData.data?.length) return null;
 
-	const [products, setProducts] = useState<Product[]>(initialProducts);
-	const [currentPage, setCurrentPage] = useState<number>(initialCurrentPage);
-	const [isLoading, setIsLoading] = useState<boolean>(false);
+		const page = pageIndex + 1;
+		const query = new URLSearchParams({
+			...currentSearchParams as Record<string, string>,
+			page: page.toString()
+		}).toString();
 
-	useEffect(() => {
-		setProducts(initialProducts);
-		setCurrentPage(initialCurrentPage);
-	}, [initialProducts, initialCurrentPage, totalProducts, categorySlug]);
+		return `/api/categories/${categorySlug}/products?${query}`;
+	};
 
-	const handleLoadMore = async () => {
-		if (isLoading || currentPage >= lastPage) return;
-
-		setIsLoading(true);
-		try {
-			const nextPage = currentPage + 1;
-			const response = await loadMoreProductsAction(categorySlug, nextPage, currentSearchParams);
-
-			if (response.data) {
-				setProducts(prev => {
-					const newItems = response.data.filter(
-							(newItem: Product) => !prev.some((existingItem) => existingItem.id === newItem.id)
-					);
-
-					return [...prev, ...newItems];
-				});
-				setCurrentPage(nextPage);
-			} else {
-				console.warn(response.message);
-				alert("Có lỗi xảy ra: " + response.message);
+	const { data, size, setSize, isValidating } = useSWRInfinite(
+			getKey,
+			fetcher,
+			{
+				fallbackData: [
+					{
+						data: initialProducts,
+						meta: { current_page: 1, last_page: lastPage, total: totalProducts }
+					}
+				],
+				revalidateFirstPage: false,
+				revalidateOnFocus: false,
 			}
-		} catch (error) {
-			console.error("Lỗi network hoặc lỗi không xác định:", error);
-		} finally {
-			setIsLoading(false);
+	);
+
+	const products = data ? data.flatMap(page => page.data) : [];
+	const isReachedEnd = size >= lastPage;
+
+	const handleLoadMore = () => {
+		if (!isReachedEnd && !isValidating) {
+			setSize(size + 1);
 		}
 	};
 
@@ -76,20 +73,20 @@ export default function ProductList({
 	return (
 			<>
 				<div className="row shop_container">
-					{products.map((product) => (
+					{products.map((product: Product) => (
 							<div key={product.id} className="col-md-4 col-6">
-								<ProductCard product={product}/>
+								<ProductCard product={product} />
 							</div>
 					))}
 				</div>
 
 				<div className="row mt-4 mb-3">
 					<div className="col-12 text-center">
-						{currentPage < lastPage && (
+						{!isReachedEnd && (
 								<button
 										className="btn btn-fill-out"
 										onClick={handleLoadMore}
-										disabled={isLoading}
+										disabled={isValidating}
 										style={{
 											minWidth: '150px',
 											borderRadius: '30px',
@@ -97,7 +94,7 @@ export default function ProductList({
 											color: '#fff'
 										}}
 								>
-									{isLoading ? (
+									{isValidating ? (
 											<span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 									) : (
 											<>XEM THÊM &#8594;</>
@@ -105,11 +102,10 @@ export default function ProductList({
 								</button>
 						)}
 						<div className="mt-3">
-                       <span className="text-muted" style={{ fontSize: '16px' }}>
-                           Hiển thị {products.length} trên tổng số {totalProducts} sản phẩm
-                       </span>
+                        <span className="text-muted" style={{ fontSize: '16px' }}>
+                            Hiển thị {products.length} trên tổng số {totalProducts} sản phẩm
+                        </span>
 						</div>
-
 					</div>
 				</div>
 			</>

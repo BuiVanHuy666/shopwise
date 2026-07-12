@@ -79,7 +79,7 @@ class Category extends Model
     {
         $ids = [];
 
-        foreach ($this->load('children')->children as $child) {
+        foreach ($this->children as $child) {
             $ids[] = $child->id;
             $ids = array_merge($ids, $child->getAllChildIds());
         }

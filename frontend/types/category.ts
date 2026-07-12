@@ -9,6 +9,7 @@ export interface Category {
 
 	description?: string | null;
 	status?: number;
+	products_count?: number;
 }
 
 export interface CategoryResponse {
